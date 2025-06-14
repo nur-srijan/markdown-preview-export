@@ -1,0 +1,66 @@
+# Node Modules
+node_modules/
+
+# Build output and setup files
+out/
+dist/
+*.tsbuildinfo
+*.js.map
+*.d.ts
+setup.sh
+setup.ps1
+
+# VS Code
+.vscode/
+.vscode-test/
+*.code-workspace
+
+# Extension
+*.vsix
+extension.js
+
+# Test
+test/
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Editor directories and files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# Build caches
+.cache/
+.tmp/
+temp/
+
+# Exported files due to test
+*.pdf
+*.html
+
+# Lock files (uncomment if not tracking exact versions)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

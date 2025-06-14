@@ -1,0 +1,108 @@
+{
+  "name": "markdown-rich-preview",
+  "displayName": "Markdown Rich Preview & Export",
+  "description": "Enhance your Markdown editing experience with beautiful previews and seamless export options",
+  "version": "0.0.5-a.1",
+  "publisher": "nur-srijan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nur_srijan/markdown-preview-export.git",
+    "keywords": [
+      "markdown",
+      "preview",
+      "vscode",
+      "readme",
+      "Markdown",
+      "README",
+      "md"
+    ],
+    "author": "Nur Srijan",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/nur_srijan/markdown-preview-export/issues"
+    },
+    "homepage": ""
+  },
+  "screenshots": [
+    "images/screenshot.png"
+  ],
+  "preview": true,
+  "private": false,
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/highlight.js": "^10.1.0",
+    "@types/marked": "^4.0.8",
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vscode/test-electron": "^2.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:markdown-rich-preview.showPreview",
+    "onCommand:markdown-rich-preview.exportToHtml",
+    "onCommand:markdown-rich-preview.exportToPdf"
+  ],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "markdown-rich-preview.showPreview",
+        "title": "Open Enhanced Preview",
+        "category": "Markdown"
+      },
+      {
+        "command": "markdown-rich-preview.exportToHtml",
+        "title": "Export to HTML",
+        "category": "Markdown"
+      },
+      {
+        "command": "markdown-rich-preview.exportToPdf",
+        "title": "Export to PDF",
+        "category": "Markdown"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorLangId == 'markdown'",
+          "command": "markdown-rich-preview.showPreview",
+          "group": "navigation"
+        },
+        {
+          "when": "editorLangId == 'markdown'",
+          "command": "markdown-rich-preview.exportToHtml",
+          "group": "navigation@2"
+        },
+        {
+          "when": "editorLangId == 'markdown'",
+          "command": "markdown-rich-preview.exportToPdf",
+          "group": "navigation@3"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.22",
+    "marked": "^11.2.0",
+    "marked-katex-extension": "^5.1.4",
+    "puppeteer": "^22.0.0"
+  }
+}

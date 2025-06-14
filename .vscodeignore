@@ -1,0 +1,25 @@
+.git
+.gitignore
+# node_modules/**
+test/**
+example.md
+test.md
+.vscode/**
+.vscode-test/**
+images/**/*.psd
+**/*.map
+*.vsix
+.eslintrc.json
+.eslintignore
+tsconfig.json
+webpack.config.js
+setup.ps1
+setup.sh
+
+# Source files
+src/**
+# Development version of extension.js
+/extension.js
+/extension.js.map
+# Keep dist files
+!out/src/**
