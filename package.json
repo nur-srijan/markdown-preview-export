@@ -2,8 +2,9 @@
   "name": "markdown-rich-preview",
   "displayName": "Markdown Rich Preview & Export",
   "description": "Enhance your Markdown editing experience with beautiful previews and seamless export options",
-  "version": "0.0.8",
+  "version": "0.2.0",
   "publisher": "nur-srijan",
+  "author": "Nur Srijan",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,17 +21,14 @@
       "Vscode",
       "Programming Languages"
     ],
-    "author": "Nur Srijan",
-    "license": "MIT",
     "bugs": {
       "url": "https://github.com/nur_srijan/markdown-preview-export/issues"
     },
-    "homepage": ""
+    "homepage": "https://github.com/nur_srijan/markdown-preview-export"
   },
   "screenshots": [
     "images/screenshot.png"
   ],
-  "preview": true,
   "private": false,
   "engines": {
     "vscode": "^1.80.0"
