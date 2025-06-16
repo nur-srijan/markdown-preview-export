@@ -4,13 +4,14 @@ A powerful Visual Studio Code extension that transforms your Markdown editing ex
 
 Yes, no Pandoc hacks at all!
 
-![Demo](https://via.placeholder.com/800x400.png?text=Markdown+Rich+Preview+Export+Demo)
-
 ## ✨ Features
 
 - **Rich Markdown Preview** - Instant, side-by-side preview with GitHub-like styling
+![Enhanced Preview Demo](https://github.com/nur-srijan/markdown-preview-export/raw/refs/heads/main/images/EnhancedPreviewDemo.gif)
 - **Export to PDF** - Create professional PDF documents with proper formatting
+![Export to PDF Demo](https://github.com/nur-srijan/markdown-preview-export/raw/refs/heads/main/images/ExportPDFDemo.gif)
 - **Export to HTML** - Generate standalone HTML files with all styles included
+![Export to HTML Demo](https://github.com/nur-srijan/markdown-preview-export/raw/refs/heads/main/images/ExportHTMLDemo.gif)
 - **Real-time Updates** - See changes instantly as you type
 - **Syntax Highlighting** - Beautiful code blocks with syntax highlighting
 - **Math Support** - Support for KaTeX math rendering
