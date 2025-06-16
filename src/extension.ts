@@ -4,8 +4,54 @@ import { marked } from 'marked';
 import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import * as fs from 'fs';
-import puppeteer from 'puppeteer';
+import * as puppeteer from 'puppeteer';
 import markedKatex from 'marked-katex-extension';
+
+declare const global: { browserInstance?: puppeteer.Browser };
+
+// Reusable browser instance for PDF exports
+let browserInstance: puppeteer.Browser | null = null;
+
+// Function to get or create browser instance
+async function getBrowserInstance(): Promise<puppeteer.Browser> {
+    if (!browserInstance || !await isBrowserAvailable(browserInstance)) {
+        if (browserInstance) {
+            try {
+                await browserInstance.close();
+            } catch (error) {
+                console.error('Error closing browser instance:', error);
+            }
+        }
+        browserInstance = await puppeteer.launch({ 
+            headless: true, // Using boolean for compatibility
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+    }
+    return browserInstance;
+}
+
+// Check if browser instance is still available
+async function isBrowserAvailable(browser: puppeteer.Browser): Promise<boolean> {
+    try {
+        // Try to get the browser process ID to check if it's still running
+        const process = browser.process();
+        return !!process && !process.killed;
+    } catch (error) {
+        return false;
+    }
+}
+
+// Function to clean up browser instance
+async function cleanupBrowser(): Promise<void> {
+    if (browserInstance) {
+        try {
+            await browserInstance.close();
+            browserInstance = null;
+        } catch (error) {
+            console.error('Error cleaning up browser instance:', error);
+        }
+    }
+}
 
 // Extend the MarkedOptions interface to include all necessary properties
 interface ExtendedMarkedOptions extends MarkedOptions {
@@ -117,35 +163,57 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         if (uri) {
-            let browser;
+            let page: puppeteer.Page | null = null;
             try {
-                vscode.window.showInformationMessage('Generating PDF... This may take a moment.');
-                browser = await puppeteer.launch({ headless: true });
-                const page = await browser.newPage();
-                // Set a base URL to allow relative paths for resources if any were used (though current HTML is self-contained or uses CDNs)
-                // For local images, they would need to be absolute paths or converted to data URIs.
-                await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-                
-                const pdfBuffer = await page.pdf({
-                    format: 'A4',
-                    printBackground: true,
-                    margin: {
-                        top: '20mm',
-                        right: '20mm',
-                        bottom: '20mm',
-                        left: '20mm'
+                vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Notification,
+                    title: 'Generating PDF...',
+                    cancellable: false
+                }, async () => {
+                    try {
+                        const browser = await getBrowserInstance();
+                        page = await browser.newPage();
+                        
+                        // Set a timeout for page operations
+                        page.setDefaultNavigationTimeout(30000);
+                        
+                        // Use domcontentloaded for faster rendering since we're not waiting for network resources
+                        await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
+                        
+                        // Wait for any remaining resources to load (with a timeout)
+                        try {
+                            await page.waitForNetworkIdle({ timeout: 2000 });
+                        } catch (e) {
+                            // Ignore timeout errors, proceed with what we have
+                        }
+                        
+                        const pdfBuffer = await page.pdf({
+                            format: 'A4',
+                            printBackground: true,
+                            margin: {
+                                top: '20mm',
+                                right: '20mm',
+                                bottom: '20mm',
+                                left: '20mm'
+                            },
+                            preferCSSPageSize: true
+                        });
+
+                        fs.writeFileSync(uri.fsPath, pdfBuffer);
+                        vscode.window.showInformationMessage(`Successfully exported PDF to ${path.basename(uri.fsPath)}`);
+                    } catch (error) {
+                        vscode.window.showErrorMessage(`Failed to export PDF: ${error instanceof Error ? error.message : String(error)}`);
+                        console.error('PDF Export Error:', error);
+                        throw error; // Re-throw to ensure the progress indicator shows the error
+                    } finally {
+                        if (page && !page.isClosed()) {
+                            await page.close().catch(console.error);
+                        }
                     }
                 });
-                await browser.close();
-
-                fs.writeFileSync(uri.fsPath, pdfBuffer);
-                vscode.window.showInformationMessage(`Successfully exported PDF to ${uri.fsPath}`);
             } catch (error) {
-                if (browser) {
-                    await browser.close();
-                }
-                vscode.window.showErrorMessage(`Failed to export PDF: ${error instanceof Error ? error.message : String(error)}`);
-                console.error('PDF Export Error:', error);
+                console.error('Error in PDF export:', error);
+                // Don't close the browser here as we want to reuse it
             }
         }
     });
@@ -226,7 +294,16 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
     // Configure KaTeX with default options
     marked.use(markedKatex());
     
+    // Configure marked options with type assertion for highlight function
     marked.setOptions(markedOptions);
+    
+    // Clean up browser instance when extension is deactivated
+    vscode.workspace.onDidCloseTextDocument(() => {
+        // Clean up browser instance when no more markdown previews are open
+        if (vscode.window.visibleTextEditors.filter(e => e.document.languageId === 'markdown').length === 0) {
+            void cleanupBrowser();
+        }
+    });
 
     // Convert markdown to HTML
     const htmlContent = marked.parse(markdownContent);

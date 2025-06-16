@@ -136,12 +136,3 @@ function sayHello() {
 > This is a blockquote.
 > 
 > It can span multiple lines and looks properly styled in the preview.
-
-## Why This Extension Matters
-
-When you write documentation, notes, or plans in Markdown, you shouldn't have to:
-1. Switch to another preview tool
-2. Push to GitHub to see how it looks
-3. Deal with raw Markdown syntax when reading
-
-This extension lets you read your Markdown files with proper formatting right inside VS Code! 

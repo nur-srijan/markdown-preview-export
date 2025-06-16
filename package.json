@@ -2,20 +2,23 @@
   "name": "markdown-rich-preview",
   "displayName": "Markdown Rich Preview & Export",
   "description": "Enhance your Markdown editing experience with beautiful previews and seamless export options",
-  "version": "0.0.5-a.1",
+  "version": "0.0.8",
   "publisher": "nur-srijan",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/nur_srijan/markdown-preview-export.git",
     "keywords": [
-      "markdown",
-      "preview",
-      "vscode",
-      "readme",
       "Markdown",
+      "md",
+      "Readme",
       "README",
-      "md"
+      "Preview",
+      "Export",
+      "Markdown-to-PDF",
+      "Markdown-to-HTML",
+      "Vscode",
+      "Programming Languages"
     ],
     "author": "Nur Srijan",
     "license": "MIT",
@@ -33,12 +36,14 @@
     "vscode": "^1.80.0"
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run build",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "package": "vsce package"
+    "build": "node --experimental-modules esbuild.config.mjs",
+    "package": "npm run build && vsce package",
+    "dev": "npm run watch"
   },
   "devDependencies": {
     "@types/highlight.js": "^10.1.0",
@@ -48,18 +53,24 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vscode/test-electron": "^2.0.0",
+    "@vscode/vsce": "^3.5.0",
+    "esbuild": "^0.21.5",
+    "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^8.0.0",
     "typescript": "^5.0.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages",
+    "Formatters",
+    "Visualization"
   ],
+
+  "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:markdown-rich-preview.showPreview",
     "onCommand:markdown-rich-preview.exportToHtml",
     "onCommand:markdown-rich-preview.exportToPdf"
   ],
-  "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
       {
