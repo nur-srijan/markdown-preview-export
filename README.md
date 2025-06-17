@@ -2,8 +2,6 @@
 
 A powerful VS Code extension that brings GitHub-style Markdown previews and one-click PDF/HTML exports right into your editor—no more Pandoc hacks or context-switching.
 
-Yes, no Pandoc hacks at all!
-
 ## ✨ Features
 
 - **Rich Markdown Preview** - Instant, side-by-side preview with GitHub-like styling
