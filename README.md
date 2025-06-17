@@ -8,15 +8,15 @@ Yes, no Pandoc hacks at all!
 
 - **Rich Markdown Preview** - Instant, side-by-side preview with GitHub-like styling
 
-![Enhanced Preview Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/images/EnhancedPreviewDemo.gif)
+![Enhanced Preview Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/assets/EnhancedPreviewDemo.gif)
 
 - **Export to PDF** - Create professional PDF documents with proper formatting
 
-![Export to PDF Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/images/ExportPDFDemo.gif)
+![Export to PDF Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/assets/ExportToPdf.png)
 
 - **Export to HTML** - Generate standalone HTML files with all styles included
 
-![Export to HTML Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/images/ExportHTMLDemo.gif)
+![Export to HTML Demo](https://raw.githubusercontent.com/nur-srijan/markdown-preview-export/main/assets/ExportToHtml.png)
 
 - **Real-time Updates** - See changes instantly as you type
 - **Syntax Highlighting** - Beautiful code blocks with syntax highlighting

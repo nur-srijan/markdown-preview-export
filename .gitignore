@@ -59,7 +59,8 @@ temp/
 # Exported files due to test
 *.pdf
 *.html
-
+# Deprecated assets
+assets/deprecated/
 # Lock files (uncomment if not tracking exact versions)
 # package-lock.json
 # yarn.lock
