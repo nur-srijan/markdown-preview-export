@@ -65,7 +65,7 @@ interface ExtendedMarkedOptions extends MarkedOptions {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Markdown: Rich Preview is now active!');
+    console.log('Markdown Rich Preview & Export is now active!');
 
     // Register the command
     const disposable = vscode.commands.registerCommand('markdown-rich-preview.showPreview', () => {

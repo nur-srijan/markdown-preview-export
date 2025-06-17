@@ -2,33 +2,23 @@
   "name": "markdown-rich-preview",
   "displayName": "Markdown Rich Preview & Export",
   "description": "Enhance your Markdown editing experience with beautiful previews and seamless export options",
-  "version": "0.1.0",
+  "icon": "images/icon.png",
+  "version": "1.0.0",
   "publisher": "nur-srijan",
-  "author": "Nur Srijan",
+  "author": {
+    "name": "Nur Srijan",
+    "email": "nursrijan1421@gmail.com",
+    "url": "https://nur-srijan.github.io"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/nur-srijan/markdown-preview-export.git",
-    "keywords": [
-      "Markdown",
-      "md",
-      "Readme",
-      "README",
-      "Preview",
-      "Export",
-      "Markdown-to-PDF",
-      "Markdown-to-HTML",
-      "Vscode",
-      "Programming Languages"
-    ],
     "bugs": {
       "url": "https://github.com/nur-srijan/markdown-preview-export/issues"
     },
     "homepage": "https://github.com/nur-srijan/markdown-preview-export"
   },
-  "screenshots": [
-    "images/screenshot.png"
-  ],
   "private": false,
   "engines": {
     "vscode": "^1.80.0"
@@ -62,7 +52,18 @@
     "Formatters",
     "Visualization"
   ],
-
+  "keywords": [
+    "Markdown",
+    "md",
+    "Readme",
+    "README",
+    "Preview",
+    "Export",
+    "Markdown-to-PDF",
+    "Markdown-to-HTML",
+    "Vscode",
+    "Programming Languages"
+  ],
   "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:markdown-rich-preview.showPreview",
