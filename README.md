@@ -1,6 +1,6 @@
 # Markdown Rich Preview & Export 🚀
 
-A powerful Visual Studio Code extension that transforms your Markdown editing experience with beautiful previews and seamless export options. Say goodbye to switching between tools - preview, export to PDF, or generate HTML files without leaving your editor!
+A powerful VS Code extension that brings GitHub-style Markdown previews and one-click PDF/HTML exports right into your editor—no more Pandoc hacks or context-switching.
 
 Yes, no Pandoc hacks at all!
 
@@ -25,8 +25,8 @@ Yes, no Pandoc hacks at all!
 
 ## 🚀 Quick Start
 
-1. **Install** the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?item=your-extension-id)
-2. **Open** any Markdown ([.md](cci:7://file:///c:/Users/somit/MyDevOps/VSCode_xtension/README.md:0:0-0:0)) file
+1. **Install** the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?item=markdown-rich-preview)
+2. **Open** any Markdown ([.md]()) file
 3. **Right-click** in the editor and choose one of these options:
    - "Markdown: Open Enhanced Preview" - For live preview
    - "Markdown: Export to HTML" - To save as HTML

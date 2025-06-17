@@ -1,7 +1,7 @@
 {
   "name": "markdown-rich-preview",
   "displayName": "Markdown Rich Preview & Export",
-  "description": "Enhance your Markdown editing experience with beautiful previews and seamless export options",
+  "description": "GitHub-style Markdown previews with seamless PDF and HTML export",
   "icon": "images/icon.png",
   "version": "1.0.0",
   "publisher": "nur-srijan",
