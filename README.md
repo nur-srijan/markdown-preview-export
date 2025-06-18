@@ -1,5 +1,17 @@
 # Markdown Rich Preview & Export 🚀
 
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview">
+    <img src="https://vsmarketplacebadges.dev/version/nur-srijan.markdown-rich-preview.svg" alt="VS Code Marketplace Version" />
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview">
+    <img src="https://vsmarketplacebadges.dev/rating-star/nur-srijan.markdown-rich-preview.svg" alt="Rating" />
+  </a>
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
+</p>
+
+**💡 Feature requests or issues? → [Open an issue](https://github.com/nur-srijan/markdown-preview-export/issues/new/choose)**
+
 A powerful VS Code extension that brings GitHub-style Markdown previews and one-click PDF/HTML exports right into your editor—no more Pandoc hacks or context-switching.
 
 ## ✨ Features
@@ -23,7 +35,7 @@ A powerful VS Code extension that brings GitHub-style Markdown previews and one-
 
 ## 🚀 Quick Start
 
-1. **Install** the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?item=markdown-rich-preview)
+1. **Install** the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
 2. **Open** any Markdown ([.md]()) file
 3. **Right-click** in the editor and choose one of these options:
    - "Markdown: Open Enhanced Preview" - For live preview
@@ -90,4 +102,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Made with ❤️ by Nur Srijan | [GitHub](https://github.com/nur-srijan) | [Twitter](https://twitter.com/nur_srijan)
+Made with ❤️ by Nur Srijan | [GitHub](https://github.com/nur-srijan) | [Twitter]()
