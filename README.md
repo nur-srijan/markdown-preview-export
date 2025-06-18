@@ -1,16 +1,10 @@
 # Markdown Rich Preview & Export 🚀
 
-<p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview">
-    <img src="https://vsmarketplacebadges.dev/version/nur-srijan.markdown-rich-preview.svg" alt="VS Code Marketplace Version" />
-  </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview">
-    <img src="https://vsmarketplacebadges.dev/rating-star/nur-srijan.markdown-rich-preview.svg" alt="Rating" />
-  </a>
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
-</p>
+[![VS Code Marketplace Version](https://vsmarketplacebadges.dev/version/nur-srijan.markdown-rich-preview.svg)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
+[![Rating](https://vsmarketplacebadges.dev/rating-star/nur-srijan.markdown-rich-preview.svg)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://marketplace.visualstudio.com/items/nur-srijan.markdown-rich-preview/license)
 
-**💡 Feature requests or issues? → [Open an issue](https://github.com/nur-srijan/markdown-preview-export/issues/new/choose)**
+**💡 Feature requests or issues? → <a href="https://github.com/nur-srijan/markdown-preview-export/issues/new/choose">Open an issue</a>**
 
 A powerful VS Code extension that brings GitHub-style Markdown previews and one-click PDF/HTML exports right into your editor—no more Pandoc hacks or context-switching.
 
