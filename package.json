@@ -24,14 +24,19 @@
     "vscode": "^1.80.0"
   },
   "scripts": {
+    "clean": "rimraf out dist .esbuild .turbo temp",
     "vscode:prepublish": "npm run build",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
+    "test": "npm run compile && node ./out/test/runTest.js",
     "lint": "eslint src --ext ts",
-    "build": "node --experimental-modules esbuild.config.mjs",
+    "build": "npm run clean && node --experimental-modules esbuild.config.mjs",
     "package": "npm run build && vsce package",
-    "dev": "npm run watch"
+    "dev": "npm run watch",
+    "publish:vsce": "npm run package && vsce publish",
+    "publish:ovsx": "npm run package && ovsx publish",
+    "publish:all": "npm run publish:vsce && npm run publish:ovsx"
   },
   "devDependencies": {
     "@types/highlight.js": "^10.1.0",
