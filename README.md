@@ -1,8 +1,10 @@
 # Markdown Rich Preview & Export 🚀
 
-[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nur-srijan.markdown-rich-preview?style=plastic)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
-[![Rating](https://img.shields.io/visual-studio-marketplace/stars/nur-srijan.markdown-rich-preview?style=plastic)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
-[![Open-VSX](https://img.shields.io/open-vsx/v/nur-srijan/markdown-rich-preview)](https://open-vsx.org/extension/nur-srijan/markdown-rich-preview)
+[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nur-srijan.markdown-rich-preview?style=plastic&label=Visual%20Studio%20Marketplace&color=green
+)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
+[![Rating](https://img.shields.io/visual-studio-marketplace/stars/nur-srijan.markdown-rich-preview?style=plastic&label=Rating)](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
+[![Open-VSX](https://img.shields.io/open-vsx/v/nur-srijan/markdown-rich-preview?style=plastic&label=Open%20VSX%20Registry)](https://open-vsx.org/extension/nur-srijan/markdown-rich-preview)
+[![Open-VSX Rating](https://img.shields.io/open-vsx/stars/nur-srijan/markdown-rich-preview?style=plastic&label=Open%20VSX%20Rating)](https://open-vsx.org/extension/nur-srijan/markdown-rich-preview)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://marketplace.visualstudio.com/items/nur-srijan.markdown-rich-preview/license)
 
 **💡 Feature requests or issues? → <a href="https://github.com/nur-srijan/markdown-preview-export/issues/new/choose">Open an issue</a>**
