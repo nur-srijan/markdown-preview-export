@@ -1,0 +1,11 @@
+name: "📚 Docs Feedback"
+description: "Found something confusing or missing in the documentation"
+title: "[Docs] "
+labels: [documentation]
+body:
+  - type: textarea
+    attributes:
+      label: What needs clarification or updating?
+      placeholder: "The README doesn't explain how to preview math expressions using LaTeX."
+    validations:
+      required: true
