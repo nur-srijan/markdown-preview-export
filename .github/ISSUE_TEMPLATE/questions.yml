@@ -1,0 +1,11 @@
+name: "❓ Question"
+description: "Ask anything about usage, setup, or behavior"
+title: "[Question] "
+labels: [question]
+body:
+  - type: textarea
+    attributes:
+      label: What's your question?
+      placeholder: "How do I use custom CSS styles for exported PDF?"
+    validations:
+      required: true
