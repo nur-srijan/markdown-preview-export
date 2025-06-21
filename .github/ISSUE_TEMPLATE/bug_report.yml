@@ -1,0 +1,39 @@
+name: "🐛 Bug report"
+description: "Report something not working as expected"
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Describe the problem, ideally with steps to reproduce it.
+      placeholder: |
+        1. Open VS Code
+        2. Load a markdown file
+        3. Click Export to PDF
+        4. Error appears
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Extension Version
+      placeholder: "e.g., 1.2.3"
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: VS Code Version
+      placeholder: "e.g., 1.89.0"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: System Info
+      description: OS, Node version, any other relevant system details
+      placeholder: |
+        OS: Windows 11 / macOS Sonoma  
+        Node: 18.x  
+        Arch: x64
