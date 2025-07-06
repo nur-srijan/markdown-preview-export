@@ -7,7 +7,7 @@
 [![Open-VSX Rating](https://img.shields.io/open-vsx/stars/nur-srijan/markdown-rich-preview?style=plastic&label=Open%20VSX%20Rating)](https://open-vsx.org/extension/nur-srijan/markdown-rich-preview)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://marketplace.visualstudio.com/items/nur-srijan.markdown-rich-preview/license)
 
-**💡 Feature requests or issues? → <a href="https://github.com/nur-srijan/markdown-preview-export/issues/new/choose">Open an issue</a>**
+**💡 Feature requests or issues?** → Open an issue [here](https://github.com/nur-srijan/markdown-preview-export/issues/new/choose)
 
 A powerful VS Code extension that brings GitHub-style Markdown previews and one-click PDF/HTML exports right into your editor—no more Pandoc hacks or context-switching.
 
@@ -59,14 +59,11 @@ A powerful VS Code extension that brings GitHub-style Markdown previews and one-
 
 ```bash
 # Clone the repository
-git clone [https://github.com/nur-srijan/markdown-preview-export.git](https://github.com/nur-srijan/markdown-preview-export.git)
+git clone https://github.com/nur-srijan/markdown-preview-export.git
 cd markdown-preview-export
 
 # Install dependencies
 npm install
-
-# Build the extension
-npm run compile
 
 # Package the extension (creates .vsix file)
 npx vsce package
@@ -99,4 +96,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Made with ❤️ by Nur Srijan | [GitHub](https://github.com/nur-srijan) | [Twitter]()
+Made with ❤️ by Nur Srijan | [GitHub](https://github.com/nur-srijan) | [X]()

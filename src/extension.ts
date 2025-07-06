@@ -315,7 +315,7 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown: Rich Preview</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>
@@ -411,17 +411,15 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
         }
         
         pre {
-            background-color: #f6f8fa;
+            background-color:rgb(9, 7, 10);
             overflow: auto;
             margin: 0;
         }
         
         code {
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
-            background-color: rgba(27, 31, 35, 0.05);
-            border-radius: 3px;
             padding: 0.2em 0.4em;
-            font-size: 85%;
+            font-size: 90%;
         }
         
         pre code {
@@ -431,7 +429,7 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
 
         .code-block {
             position: relative;
-            background-color: #f6f8fa;
+            background-color:rgb(9, 7, 10);
             border-radius: 6px;
             margin: 1em 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -443,14 +441,13 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color: #e7eeef;
-            border-bottom: 1px solid #ddd;
+            background-color:rgb(37, 35, 39);
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
 
         .language {
-            color: #666;
+            color: #efe9e9;
             font-size: 0.9em;
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
         }
@@ -458,7 +455,7 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
         .copy-button {
             padding: 4px 8px;
             font-size: 0.9em;
-            color: #666;
+            color: #efe9e9;
             background-color: transparent;
             border: 1px solid #ddd;
             border-radius: 4px;

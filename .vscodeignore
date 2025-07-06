@@ -5,9 +5,14 @@
 .vscode-test/**
 node_modules/**
 
+# Workflow files and templates
+.github/**
+
 # Source files
 src/**
 !out/**
+**/*.ts
+**/*.map
 
 # Build outputs
 *.tsbuildinfo
@@ -16,6 +21,8 @@ src/**
 # Test files
 test/**
 *.test.*
+.html
+.pdf
 
 # Documentation
 example.md
