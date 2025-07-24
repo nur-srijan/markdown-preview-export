@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.1.0) - 2025-07-24
+### 🚀 New Features
+
+- 🎨 Emojis are now visible in exported PDFs: Emoji characters are automatically replaced with Twemoji SVG images during PDF export, ensuring consistent emoji rendering across all platforms.
+
+### 🐛 Bug Fixes
+
+- 🐛 General optimizations and code improvements.
+- 📦 Extension size significantly reduced: Minified from ~38MB to ~7MB for faster installs and updates!
+
 All notable changes to this project will be documented in this file.
 
 ---

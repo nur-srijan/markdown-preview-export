@@ -1,51 +1,26 @@
+# Build output
+dist/
+
 # Development files
-.git
-.gitignore
-.vscode/**
-.vscode-test/**
-node_modules/**
+.vscode/
+.vscode-test/
+node_modules/
+src/
+test/
 
-# Workflow files and templates
-.github/**
-
-# Source files
-src/**
-!out/**
-**/*.ts
-**/*.map
-
-# Build outputs
-*.tsbuildinfo
-*.map
-
-# Test files
-test/**
-*.test.*
-.html
-.pdf
-
-# Documentation
-example.md
-test.md
-
-# Configuration files
+# Config files
+esbuild.js
+tsconfig.json
 .eslintrc.json
 .eslintignore
 *.config.*
-setup.*
 
-# VS Code specific
+# Other
+assets/
+.gitignore
+.github/
 *.vsix
-
-# Logs and debug
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Misc
-.DS_Store
-Thumbs.db
-
-# Demo & Screenshot in Assets
-assets/**
+*.tsbuildinfo
+*.map
+example.md

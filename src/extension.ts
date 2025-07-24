@@ -6,6 +6,11 @@ import hljs from 'highlight.js';
 import * as fs from 'fs';
 import * as puppeteer from 'puppeteer';
 import markedKatex from 'marked-katex-extension';
+import twemoji from 'twemoji';
+
+// Fix for missing types for marked-katex-extension
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference types="node" />
 
 declare const global: { browserInstance?: puppeteer.Browser };
 
@@ -306,8 +311,17 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
     });
 
     // Convert markdown to HTML
-    const htmlContent = marked.parse(markdownContent);
-    
+    let htmlContent = marked.parse(markdownContent);
+
+    // Replace emoji characters with Twemoji images for PDF export
+    if (isForPdf) {
+        htmlContent = twemoji.parse(htmlContent as string, {
+            folder: 'svg',
+            ext: '.svg',
+            base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
+        }) as string;
+    }
+
     // Return the complete HTML document
     return `<!DOCTYPE html>
 <html lang="en">
@@ -364,6 +378,14 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
             font-size: 14px;
             line-height: 1.6;
             padding: 0 20px;
+        }
+        /* Twemoji emoji image style for inline, text-sized emojis */
+        img.emoji {
+            height: 1em;
+            width: 1em;
+            margin: 0 .05em 0 .1em;
+            vertical-align: -0.1em;
+            display: inline;
         }
         
         h1, h2, h3, h4, h5, h6 {
@@ -441,7 +463,7 @@ function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): 
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color:rgb(37, 35, 39);
+            background-color:rgb(32, 30, 43);
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }

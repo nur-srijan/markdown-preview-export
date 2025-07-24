@@ -3,7 +3,7 @@
   "displayName": "Markdown Rich Preview & Export",
   "description": "GitHub-style Markdown previews with seamless PDF and HTML export",
   "icon": "images/icon.png",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "publisher": "nur-srijan",
   "author": {
     "name": "Nur Srijan",
@@ -24,24 +24,25 @@
     "vscode": "^1.80.0"
   },
   "scripts": {
-    "clean": "rimraf out dist .esbuild .turbo temp",
-    "vscode:prepublish": "npm run build",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "test": "npm run compile && node ./out/test/runTest.js",
-    "lint": "eslint src --ext ts",
-    "build": "npm run clean && node --experimental-modules esbuild.config.mjs",
-    "package": "npm run build && vsce package",
-    "dev": "npm run watch",
-    "publish:vsce": "npm run package && vsce publish",
-    "publish:ovsx": "npm run package && ovsx publish",
-    "publish:all": "npm run publish:vsce && npm run publish:ovsx"
+    "clean": "rimraf out",
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run clean && npm run check-types && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/highlight.js": "^10.1.0",
     "@types/marked": "^4.0.8",
     "@types/node": "^18.0.0",
+    "@types/twemoji": "^13.1.1",
     "@types/vscode": "^1.80.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -70,11 +71,6 @@
     "Programming Languages"
   ],
   "main": "./out/extension.js",
-  "activationEvents": [
-    "onCommand:markdown-rich-preview.showPreview",
-    "onCommand:markdown-rich-preview.exportToHtml",
-    "onCommand:markdown-rich-preview.exportToPdf"
-  ],
   "contributes": {
     "commands": [
       {
