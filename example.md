@@ -31,7 +31,7 @@ def hello(name):
     print(f"Hello, {name}! 👋")
 ```
 
-```js
+```javascript
 // JavaScript code example
 console.log('Hello, world! 🌍');
 ```

@@ -24,3 +24,5 @@ assets/
 *.tsbuildinfo
 *.map
 example.md
+*.pdf
+*.html
