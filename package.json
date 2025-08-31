@@ -114,6 +114,6 @@
     "katex": "^0.16.22",
     "marked": "^11.2.0",
     "marked-katex-extension": "^5.1.4",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^24.17.1"
   }
 }
