@@ -27,12 +27,106 @@ async function getBrowserInstance(): Promise<puppeteer.Browser> {
                 console.error('Error closing browser instance:', error);
             }
         }
-        browserInstance = await puppeteer.launch({ 
-            headless: true, // Using boolean for compatibility
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+        browserInstance = await launchPuppeteerWithFallbacks();
     }
     return browserInstance;
+}
+
+// Try launching Puppeteer with multiple strategies to avoid version pinning issues
+async function launchPuppeteerWithFallbacks(): Promise<puppeteer.Browser> {
+    const commonArgs = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-zygote',
+        '--no-first-run'
+    ];
+
+    const errors: Array<string> = [];
+
+    // 1) Default bundled Chromium (if available)
+    try {
+        return await puppeteer.launch({ headless: true, args: commonArgs });
+    } catch (error) {
+        errors.push(`Default launch failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // 2) Try system Chrome via channel (stable)
+    try {
+        // @ts-expect-error channel is supported in Puppeteer >= 19
+        return await puppeteer.launch({ channel: 'chrome', headless: true, args: commonArgs } as any);
+    } catch (error) {
+        errors.push(`Channel chrome launch failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // 3) Try system Chromium via channel
+    try {
+        // @ts-expect-error channel is supported in Puppeteer >= 19
+        return await puppeteer.launch({ channel: 'chromium', headless: true, args: commonArgs } as any);
+    } catch (error) {
+        errors.push(`Channel chromium launch failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // 4) Try known executable paths
+    const candidates = getChromeExecutableCandidates();
+    for (const executablePath of candidates) {
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            const browser = await puppeteer.launch({ executablePath, headless: true, args: commonArgs });
+            return browser;
+        } catch (error) {
+            errors.push(`Executable ${executablePath} failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    // 5) Last resort: try puppeteer.executablePath() if available
+    try {
+        const p = (puppeteer as any).executablePath ? (puppeteer as any).executablePath() : undefined;
+        if (p) {
+            return await puppeteer.launch({ executablePath: p, headless: true, args: commonArgs });
+        }
+    } catch (error) {
+        errors.push(`executablePath() launch failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    throw new Error(
+        'Failed to launch Chrome/Chromium for PDF export. Attempts: \n' + errors.join('\n') +
+        '\nPlease ensure Google Chrome or Chromium is installed and accessible.'
+    );
+}
+
+function getChromeExecutableCandidates(): string[] {
+    const candidates: Array<string> = [];
+    const platform = process.platform;
+    if (platform === 'linux') {
+        candidates.push(
+            '/usr/bin/google-chrome-stable',
+            '/usr/bin/google-chrome',
+            '/usr/bin/chromium',
+            '/usr/bin/chromium-browser',
+            '/snap/bin/chromium',
+            '/opt/google/chrome/chrome'
+        );
+    } else if (platform === 'darwin') {
+        candidates.push(
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '/Applications/Chromium.app/Contents/MacOS/Chromium'
+        );
+    } else if (platform === 'win32') {
+        candidates.push(
+            'C:/Program Files/Google/Chrome/Application/chrome.exe',
+            'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+            'C:/Program Files/Chromium/Application/chrome.exe'
+        );
+    }
+
+    // Environment overrides commonly used in CI/containers
+    const envPaths = [
+        process.env.PUPPETEER_EXECUTABLE_PATH,
+        process.env.CHROME_PATH
+    ].filter((p): p is string => !!p && p.length > 0);
+    return [...envPaths, ...candidates].filter((p, idx, arr) => arr.indexOf(p) === idx);
 }
 
 // Check if browser instance is still available
