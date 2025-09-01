@@ -4,3 +4,25 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Automatically merge minor and patch updates after CI passes
+    open-pull-requests-limit: 10
+    # Add labels to dependabot PRs for better organization
+    labels:
+      - "dependencies"
+      - "automated"
+    # Group related updates together
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "@typescript-eslint/*"
+          - "eslint*"
+          - "typescript"
+          - "mocha"
+          - "@vscode/*"
+      production-dependencies:
+        patterns:
+          - "puppeteer"
+          - "marked*"
+          - "highlight.js"
+          - "katex"

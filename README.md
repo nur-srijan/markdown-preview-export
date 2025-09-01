@@ -89,6 +89,31 @@ We welcome contributions! Here's how you can help:
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 🧪 Testing & CI
+
+This extension includes comprehensive testing to ensure reliability:
+
+- **Automated CI/CD**: GitHub Actions workflows test every change
+- **Dependency Compatibility**: Automatic testing when dependencies are updated
+- **Multi-environment Testing**: Tests against multiple Node.js and VS Code versions
+- **Security Auditing**: Automatic vulnerability scanning
+- **Auto-merge**: Safe dependency updates are automatically merged after tests pass
+
+### Running Tests Locally
+
+```bash
+# Run all tests
+npm test
+
+# Run dependency compatibility tests only
+npm run test:dependencies
+
+# Run linting and type checking
+npm run pretest
+```
+
+For more details, see [TESTING.md](./TESTING.md).
+
 ## 🙏 Acknowledgments
 - [Marked](https://github.com/markedjs/marked) - For Markdown parsing
 - [Highlight.js](https://highlightjs.org/) - For syntax highlighting

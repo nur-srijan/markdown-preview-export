@@ -36,11 +36,14 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "node out/test/runTest.js",
+    "test:dependencies": "node scripts/test-dependencies.js"
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/highlight.js": "^10.1.0",
     "@types/marked": "^4.0.8",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^18.0.0",
     "@types/twemoji": "^13.1.1",
     "@types/vscode": "^1.80.0",
@@ -51,6 +54,8 @@
     "esbuild": "^0.21.5",
     "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^8.0.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
     "typescript": "^5.0.0"
   },
   "categories": [
