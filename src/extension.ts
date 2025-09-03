@@ -54,7 +54,6 @@ async function launchPuppeteerWithFallbacks(): Promise<puppeteer.Browser> {
 
     // 2) Try system Chrome via channel (stable)
     try {
-        // @ts-expect-error channel is supported in Puppeteer >= 19
         return await puppeteer.launch({ channel: 'chrome', headless: true, args: commonArgs } as any);
     } catch (error) {
         errors.push(`Channel chrome launch failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -62,7 +61,6 @@ async function launchPuppeteerWithFallbacks(): Promise<puppeteer.Browser> {
 
     // 3) Try system Chromium via channel
     try {
-        // @ts-expect-error channel is supported in Puppeteer >= 19
         return await puppeteer.launch({ channel: 'chromium', headless: true, args: commonArgs } as any);
     } catch (error) {
         errors.push(`Channel chromium launch failed: ${error instanceof Error ? error.message : String(error)}`);

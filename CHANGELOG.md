@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.2](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.1.2) - 2025-09-03
+### 🐛 Bug Fixes
+
+- Improve browser launch reliability with multi-strategy Puppeteer initialization
+
 ## [1.1.0](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.1.0) - 2025-07-24
 ### 🚀 New Features
 
