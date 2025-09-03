@@ -1,0 +1,227 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  # Run tests when dependencies are updated
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday at 2 AM UTC
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        vscode-version: [stable, insiders]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linting
+      run: npm run lint
+    
+    - name: Check TypeScript types
+      run: npm run check-types
+    
+    - name: Compile extension
+      run: npm run compile
+    
+    - name: Install xvfb for headless testing
+      run: sudo apt-get update && sudo apt-get install -y xvfb
+    
+    - name: Run tests
+      run: xvfb-run -a npm test
+      env:
+        DISPLAY: ':99'
+
+  dependency-compatibility:
+    runs-on: ubuntu-latest
+    name: Dependency Compatibility Check
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Test Puppeteer compatibility
+      run: |
+        echo "Testing Puppeteer compatibility..."
+        node -e "
+        const puppeteer = require('puppeteer');
+        (async () => {
+          console.log('Puppeteer version:', require('puppeteer/package.json').version);
+          
+          try {
+            const browser = await puppeteer.launch({ 
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            console.log('✓ Browser launched successfully');
+            console.log('Browser version:', await browser.version());
+            
+            const page = await browser.newPage();
+            console.log('✓ Page created successfully');
+            
+            const testHtml = \`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Dependency Test</title>
+                <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css\">
+                <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css\">
+              </head>
+              <body>
+                <h1>Dependency Compatibility Test</h1>
+                <p>Testing external resource loading...</p>
+              </body>
+              </html>
+            \`;
+            
+            await page.setContent(testHtml, { waitUntil: 'domcontentloaded' });
+            console.log('✓ HTML content set successfully');
+            
+            const title = await page.title();
+            if (title !== 'Dependency Test') {
+              throw new Error(\`Expected title 'Dependency Test', got '\${title}'\`);
+            }
+            console.log('✓ Page title verification passed');
+            
+            const pdfBuffer = await page.pdf({
+              format: 'A4',
+              printBackground: true,
+              margin: {
+                top: '20mm',
+                right: '20mm', 
+                bottom: '20mm',
+                left: '20mm'
+              }
+            });
+            
+            if (!pdfBuffer || pdfBuffer.length === 0) {
+              throw new Error('PDF generation failed - empty buffer');
+            }
+            console.log(\`✓ PDF generated successfully (\${pdfBuffer.length} bytes)\`);
+            
+            await page.close();
+            await browser.close();
+            console.log('✓ All Puppeteer compatibility tests passed');
+            
+          } catch (error) {
+            console.error('✗ Puppeteer compatibility test failed:', error);
+            process.exit(1);
+          }
+        })();
+        "
+    
+    - name: Test other critical dependencies
+      run: |
+        echo "Testing other dependency compatibility..."
+        node -e "
+        // Test marked (markdown parser)
+        const { marked } = require('marked');
+        console.log('Marked version:', require('marked/package.json').version);
+        
+        const testMarkdown = '# Test\n\n```javascript\nconsole.log(\"test\");\n```\n\nThis is a **test**.';
+        const html = marked.parse(testMarkdown);
+        if (!html.includes('<h1>') || !html.includes('<code>')) {
+          throw new Error('Marked parsing failed');
+        }
+        console.log('✓ Marked compatibility test passed');
+        
+        // Test highlight.js
+        const hljs = require('highlight.js');
+        console.log('Highlight.js version:', require('highlight.js/package.json').version);
+        
+        const result = hljs.highlight('console.log(\"test\");', { language: 'javascript' });
+        if (!result.value) {
+          throw new Error('Highlight.js highlighting failed');
+        }
+        console.log('✓ Highlight.js compatibility test passed');
+        
+        // Test KaTeX
+        const katex = require('katex');
+        console.log('KaTeX version:', require('katex/package.json').version);
+        
+        const mathHtml = katex.renderToString('E = mc^2', { throwOnError: false });
+        if (!mathHtml.includes('katex')) {
+          throw new Error('KaTeX rendering failed');
+        }
+        console.log('✓ KaTeX compatibility test passed');
+        
+        console.log('✓ All dependency compatibility tests passed');
+        "
+
+  security-audit:
+    runs-on: ubuntu-latest
+    name: Security Audit
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+    
+    - name: Check for outdated dependencies
+      run: npm outdated || true # Don't fail on outdated deps, just report
+      
+  package-validation:
+    runs-on: ubuntu-latest
+    name: Package Validation
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build extension package
+      run: npm run package
+    
+    - name: Validate package structure
+      run: |
+        if [ ! -f "out/extension.js" ]; then
+          echo "❌ Extension main file not found"
+          exit 1
+        fi
+        echo "✓ Extension package structure is valid"
+    
+    - name: Install VSCE and validate extension
+      run: |
+        npm install -g @vscode/vsce
+        vsce package --no-dependencies
+        echo "✓ Extension package created successfully"
