@@ -7,6 +7,7 @@ dist/
 *.tsbuildinfo
 *.js.map
 *.d.ts
+!src/marked-katex-extension.d.ts
 setup.sh
 setup.ps1
 
