@@ -137,7 +137,17 @@ jobs:
       run: |
         echo "Testing other dependency compatibility..."
         node -e "
+        node -e "
+        // Test marked (markdown parser)
+        const { marked } = require('marked');
+        console.log('Marked version:', require('marked/package.json').version);
         
+        const testMarkdown = '# Test;
+        const html = marked.parse(testMarkdown);
+        if (!html.includes('<h1>') {
+          throw new Error('Marked parsing failed');
+        }
+        console.log('✓ Marked compatibility test passed')"
         
         // Test highlight.js
         const hljs = require('highlight.js');
