@@ -36,7 +36,8 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:ci": "node ./scripts/run-tests-ci.js"
   },
   "devDependencies": {
     "@types/highlight.js": "^10.1.0",
@@ -51,8 +52,15 @@
     "esbuild": "^0.21.5",
     "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "mocha": "^10.2.0",
+  "nyc": "^15.1.0",
+  "c8": "^8.0.0",
+    "chai": "^4.3.7"
+    ,"@types/mocha": "^10.0.1",
+    "@types/chai": "^4.3.4"
   },
+  
   "categories": [
     "Formatters",
     "Programming Languages",
