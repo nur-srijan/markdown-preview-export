@@ -5,7 +5,7 @@ on:
     paths:
       - 'package.json'
       - 'package-lock.json'
-  # Also run on dependabot PRs specifically
+  # Restrict pull_request_target to safe jobs (e.g., PR commenting only)
   pull_request_target:
     types: [opened, synchronize]
     paths:
@@ -17,14 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Dependency Updates
     
-    # Only run on dependabot PRs or when package files change
-    if: github.actor == 'dependabot[bot]' || contains(github.event.pull_request.changed_files, 'package.json') || contains(github.event.pull_request.changed_files, 'package-lock.json')
+    # Only run (dangerous steps) on PR branch, not on pull_request_target
+    if: github.event_name == 'pull_request' && (github.actor == 'dependabot[bot]' || contains(github.event.pull_request.changed_files, 'package.json') || contains(github.event.pull_request.changed_files, 'package-lock.json'))
     
     steps:
     - uses: actions/checkout@v4
       with:
-        # Use the PR head ref for pull_request_target events
-        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+        ref: ${{ github.event.pull_request.head.sha }}
     
     - name: Use Node.js 20
       uses: actions/setup-node@v4
@@ -159,6 +158,7 @@ jobs:
           });
 
   # Test against multiple VS Code versions to ensure compatibility
+    if: github.event_name == 'pull_request'
   vscode-compatibility:
     runs-on: ubuntu-latest
     name: VS Code Compatibility Test
@@ -170,7 +170,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+        ref: ${{ github.event.pull_request.head.sha }}
     
     - name: Use Node.js 20
       uses: actions/setup-node@v4
