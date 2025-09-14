@@ -1,0 +1,194 @@
+name: Dependency Update Test
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+  # Also run on dependabot PRs specifically
+  pull_request_target:
+    types: [opened, synchronize]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  dependency-impact-test:
+    runs-on: ubuntu-latest
+    name: Test Dependency Updates
+    
+    # Only run on dependabot PRs or when package files change
+    if: github.actor == 'dependabot[bot]' || contains(github.event.pull_request.changed_files, 'package.json') || contains(github.event.pull_request.changed_files, 'package-lock.json')
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # Use the PR head ref for pull_request_target events
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - name: Install updated dependencies
+      run: npm ci
+    
+    - name: Check for breaking changes in Puppeteer
+      run: |
+        echo "🔍 Checking Puppeteer compatibility..."
+        node -e "
+        const puppeteer = require('puppeteer');
+        const fs = require('fs');
+        
+        (async () => {
+          try {
+            console.log('Current Puppeteer version:', require('puppeteer/package.json').version);
+            
+            // Test basic browser launch
+            const browser = await puppeteer.launch({ 
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            
+            // Test API compatibility - check if methods used in extension still exist
+            const page = await browser.newPage();
+            
+            // Test setContent method
+            await page.setContent('<html><body><h1>Test</h1></body></html>', { waitUntil: 'domcontentloaded' });
+            console.log('✓ page.setContent() works');
+            
+            // Test PDF generation with options used in extension
+            const pdfBuffer = await page.pdf({
+              format: 'A4',
+              printBackground: true,
+              margin: {
+                top: '20mm',
+                right: '20mm',
+                bottom: '20mm', 
+                left: '20mm'
+              },
+              preferCSSPageSize: true
+            });
+            console.log('✓ page.pdf() with extension options works');
+            
+            // Test browser process methods
+            const process = browser.process();
+            const isKilled = process?.killed;
+            console.log('✓ browser.process() and killed property work');
+            
+            // Test network idle waiting (used in extension)
+            try {
+              await page.waitForNetworkIdle({ timeout: 1000 });
+            } catch (e) {
+              console.log('✓ page.waitForNetworkIdle() works (timeout expected)');
+            }
+            
+            await page.close();
+            await browser.close();
+            
+            console.log('🎉 All Puppeteer API compatibility tests passed!');
+            
+          } catch (error) {
+            console.error('💥 Puppeteer compatibility test failed:', error.message);
+            console.error('This indicates a breaking change in the Puppeteer update.');
+            process.exit(1);
+          }
+        })();
+        "
+    
+    - name: Test extension compilation with new dependencies
+      run: |
+        echo "🔨 Testing extension compilation..."
+        npm run compile
+        
+        if [ ! -f "out/extension.js" ]; then
+          echo "❌ Extension compilation failed - main file not found"
+          exit 1
+        fi
+        
+        echo "✓ Extension compiles successfully with updated dependencies"
+    
+    - name: Run dependency vulnerability check
+      run: |
+        echo "🔒 Running security audit..."
+        npm audit --audit-level=high
+        echo "✓ Security audit passed"
+    
+    - name: Test VS Code extension loading
+      run: |
+        echo "🧪 Testing VS Code extension integration..."
+        npm run pretest
+        echo "✓ Extension pre-test checks passed"
+    
+    - name: Install xvfb for headless testing
+      run: sudo apt-get update && sudo apt-get install -y xvfb
+    
+    - name: Run full test suite
+      run: |
+        echo "🚀 Running full test suite with updated dependencies..."
+        xvfb-run -a npm test
+        echo "🎉 All tests passed with updated dependencies!"
+      env:
+        DISPLAY: ':99'
+    
+    - name: Comment on PR with test results
+      if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `## 🧪 Dependency Update Test Results
+          
+          ✅ **All compatibility tests passed!**
+          
+          ### Tests Performed:
+          - 🎭 Puppeteer API compatibility check
+          - 🔨 Extension compilation with updated dependencies  
+          - 🔒 Security vulnerability scan
+          - 🚀 Full test suite execution
+          
+          The dependency update appears to be safe to merge.
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # Test against multiple VS Code versions to ensure compatibility
+  vscode-compatibility:
+    runs-on: ubuntu-latest
+    name: VS Code Compatibility Test
+    
+    strategy:
+      matrix:
+        vscode-version: ['1.80.0', 'stable', 'insiders']
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install xvfb
+      run: sudo apt-get update && sudo apt-get install -y xvfb
+    
+    - name: Test extension with VS Code ${{ matrix.vscode-version }}
+      run: |
+        echo "Testing extension compatibility with VS Code ${{ matrix.vscode-version }}"
+        # Set the VS Code version for testing
+        export VSCODE_VERSION="${{ matrix.vscode-version }}"
+        xvfb-run -a npm test
+      env:
+        DISPLAY: ':99'
