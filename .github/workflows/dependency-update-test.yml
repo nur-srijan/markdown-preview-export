@@ -160,6 +160,7 @@ jobs:
 
   # Test against multiple VS Code versions to ensure compatibility
   vscode-compatibility:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: VS Code Compatibility Test
     
