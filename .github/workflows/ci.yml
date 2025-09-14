@@ -143,7 +143,7 @@ jobs:
         
         const testMarkdown = '# Test';
         const html = marked.parse(testMarkdown);
-        if (!html.includes('<h1>') {
+        if (!html.includes('<h1>')) {
           throw new Error('Marked parsing failed');
         }
         console.log('✓ Marked compatibility test passed')"
