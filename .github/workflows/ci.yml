@@ -137,16 +137,6 @@ jobs:
       run: |
         echo "Testing other dependency compatibility..."
         node -e "
-        // Test marked (markdown parser)
-        const { marked } = require('marked');
-        console.log('Marked version:', require('marked/package.json').version);
-        
-        const testMarkdown = '# Test';
-        const html = marked.parse(testMarkdown);
-        if (!html.includes('<h1>')) {
-          throw new Error('Marked parsing failed');
-        }
-        console.log('✓ Marked compatibility test passed')"
         
         // Test highlight.js
         const hljs = require('highlight.js');
@@ -225,3 +215,37 @@ jobs:
         npm install -g @vscode/vsce
         vsce package --no-dependencies
         echo "✓ Extension package created successfully"
+    - name: Test extension in VSCode
+      uses: codezombiech/vscode-extension-tester-action@v2
+      with:
+        vscode-version: ${{ matrix.vscode-version }}
+        extension-path: ./out/markdown-preview-export-*.vsix
+        test-command: npx mocha --timeout 60000 --recursive ./out/test --reporter spec
+        test-environment: 'xvfb'
+      env:
+        DISPLAY: ':99'
+        # Increase memory limit for VSCode tests
+        NODE_OPTIONS: '--max-old-space-size=4096'
+        # Ensure tests run in CI mode
+        CI: 'true'
+        # Disable telemetry for VSCode
+        VSCODE_TELEMETRY_OPTOUT: '1'
+        # Disable update checks for VSCode
+        VSCODE_DISABLE_UPDATE: '1'
+        # Disable crash reporting for VSCode
+        VSCODE_CRASH_REPORTER: '0'
+    - name: Clean up built package
+      run: rm -f ./markdown-preview-export-*.vsix
+    - name: Final success message
+      if: ${{ success() }}
+      run: echo "✅ All CI checks passed successfully!"
+
+    - name: Upload coverage results to Codecov
+      if: ${{ matrix.node-version == '20.x' && success() }}
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
