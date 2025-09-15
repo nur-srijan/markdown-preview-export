@@ -143,13 +143,13 @@ export function activate(context: vscode.ExtensionContext) {
             }
         );
         
-        // Initial update
-        updateContent(panel, editor.document);
+    // Initial update
+    updateContent(panel, editor.document, context);
         
         // Update content when the document changes
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
-            if (e.document.uri.toString() === editor.document.uri.toString()) {
-                updateContent(panel, e.document);
+        if (e.document.uri.toString() === editor.document.uri.toString()) {
+                updateContent(panel, e.document, context);
             }
         });
         
@@ -171,7 +171,9 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const markdownContent = editor.document.getText();
-        const htmlContent = getHtmlForWebview(markdownContent);
+        // For exported HTML we can reference local files via file://
+        const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
+        const htmlContent = getHtmlForWebview(markdownContent, false, assetBaseForExport);
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.html';
         const uri = await vscode.window.showSaveDialog({
@@ -204,8 +206,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const markdownContent = editor.document.getText();
-        // Pass true for isForPdf to include PDF-specific styles
-        const htmlContent = getHtmlForWebview(markdownContent, true);
+    // Pass true for isForPdf to include PDF-specific styles
+    // For PDF export we prefer absolute file URIs so Puppeteer can load local assets
+    const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
+    const htmlContent = getHtmlForWebview(markdownContent, true, assetBaseForExport);
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.pdf';
         const uri = await vscode.window.showSaveDialog({
@@ -275,13 +279,23 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(exportToPdfCommand);
 }
 
-function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument) {
+function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument, context: vscode.ExtensionContext) {
     // Get the markdown content
     const markdownContent = document.getText();
-    
-    // Convert markdown to HTML
-    const html = getHtmlForWebview(markdownContent);
-    
+
+    // Compute asset base for webview resources using asWebviewUri
+    let assetBase;
+    try {
+        const vendorFolder = vscode.Uri.file(path.join(context.extensionPath, 'assets', 'vendor'));
+        assetBase = panel.webview.asWebviewUri(vendorFolder).toString();
+    } catch (e) {
+        // fallback to undefined (CDN)
+        assetBase = undefined;
+    }
+
+    // Convert markdown to HTML, preferring bundled assets for the webview
+    const html = getHtmlForWebview(markdownContent, false, assetBase);
+
     // Update webview content
     panel.webview.html = html;
 }

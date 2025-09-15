@@ -10,6 +10,7 @@ dist/
 !src/marked-katex-extension.d.ts
 setup.sh
 setup.ps1
+assets/vendor/
 
 # VS Code
 .vscode/

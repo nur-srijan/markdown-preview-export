@@ -17,6 +17,7 @@ tsconfig.json
 
 # Other
 assets/
+!assets/vendor/
 .gitignore
 .github/
 *.vsix

@@ -47,7 +47,7 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false): string {
+export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
     const renderer = new marked.Renderer();
 
     renderer.code = (code: string, language: string | undefined) => {
@@ -115,21 +115,26 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
         }) as string;
     }
 
+    const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown: Rich Preview</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
+    <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
+    <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
     <script>
         // Initialize highlight.js
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('pre code').forEach((block) => {
                 // @ts-ignore - browser runtime
-                hljs.highlightElement(block);
+                if (typeof hljs !== 'undefined' && hljs.highlightElement) {
+                    // @ts-ignore
+                    hljs.highlightElement(block);
+                }
             });
         });
 

@@ -30,6 +30,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Prepare vendor assets
+      run: npm run prepare
+
     - name: Check TypeScript types
       run: npm run check-types
     
@@ -59,6 +62,9 @@ jobs:
     
     - name: Install dependencies
       run: npm ci
+
+    - name: Prepare vendor assets
+      run: npm run prepare
     
     - name: Test Puppeteer compatibility
       run: |
@@ -173,6 +179,9 @@ jobs:
     
     - name: Install dependencies
       run: npm ci
+
+    - name: Prepare vendor assets
+      run: npm run prepare
     
     - name: Run security audit
       run: npm audit --audit-level=moderate
@@ -227,8 +236,9 @@ jobs:
         set -e
         # Install dependencies for running tests
         npm ci
-        # Start X virtual framebuffer and run tests with coverage
-        npm run test:ci
+  # Prepare assets and run tests with coverage
+  npm run prepare
+  npm run test:ci
       env:
         DISPLAY: ':99'
         NODE_OPTIONS: '--max-old-space-size=4096'
