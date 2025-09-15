@@ -236,9 +236,8 @@ jobs:
         set -e
         # Install dependencies for running tests
         npm ci
-  # Prepare assets and run tests with coverage
-  npm run prepare
-  npm run test:ci
+        npm run prepare
+        npm run test:ci
       env:
         DISPLAY: ':99'
         NODE_OPTIONS: '--max-old-space-size=4096'
