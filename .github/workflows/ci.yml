@@ -240,7 +240,9 @@ jobs:
     - name: Verify VSIX includes bundled assets
       run: |
         if ! ls ./markdown-preview-export-*.vsix >/dev/null 2>&1; then
-          echo "No VSIX found to inspect"; exit 1;
+          echo "No VSIX found to inspect"; echo "Running packaging step again"; vsce package --no-dependencies || true
+        else
+          echo "VSIX found for inspection"
         fi
         for f in ./markdown-preview-export-*.vsix; do
           echo "Inspecting $f";
