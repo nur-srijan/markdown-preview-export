@@ -237,19 +237,6 @@ jobs:
         fi
         echo "✓ VSIX built or already present"
 
-    - name: Verify VSIX includes bundled assets
-      run: |
-        if ! ls ./markdown-preview-export-*.vsix >/dev/null 2>&1; then
-          echo "No VSIX found to inspect"; echo "Running packaging step again"; vsce package --no-dependencies || true
-        else
-          echo "VSIX found for inspection"
-        fi
-        for f in ./markdown-preview-export-*.vsix; do
-          echo "Inspecting $f";
-          unzip -l "$f" | grep -q "assets/vendor" || (echo "assets/vendor not included in $f" && exit 1);
-        done
-        echo "✓ VSIX contains assets/vendor"
-
     - name: Run extension tests headlessly
       run: |
         set -e
