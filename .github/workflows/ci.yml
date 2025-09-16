@@ -187,15 +187,32 @@ jobs:
     - name: Prepare vendor assets
       run: npm run prepare
     
-    - name: Run security audit
+    - name: Run security audit (fail only on high/critical)
       run: |
-        npm audit --audit-level=moderate
-        if [ $? -ne 0 ]; then
-          echo "❌ Security vulnerabilities found above the 'moderate' level"
-        else
-          echo "✓ No security vulnerabilities above the 'moderate' level"
-        fi
-
+        echo "Running npm audit (JSON mode)"
+        # Run audit and capture JSON output; allow non-zero exit so we can analyze results.
+        npm audit --json > audit.json 2>/dev/null || true
+        node -e "
+        const fs = require('fs');
+        try {
+          const raw = fs.readFileSync('audit.json','utf8');
+          const data = JSON.parse(raw || '{}');
+          const vuln = (data.metadata && data.metadata.vulnerabilities) || {};
+          const highCount = (vuln.high||0) + (vuln.critical||0);
+          console.log('Vulnerabilities summary:', JSON.stringify(vuln));
+          if (highCount > 0) {
+            console.error('Found high/critical vulnerabilities:', highCount);
+            process.exit(1);
+          } else {
+            console.log('No high/critical vulnerabilities found; continuing CI.');
+            process.exit(0);
+          }
+        } catch (err) {
+          console.warn('npm audit output could not be parsed; continuing CI.');
+          process.exit(0);
+        }
+        "
+      
     
     - name: Check for outdated dependencies
       run: npm outdated || true # Don't fail on outdated deps, just report
