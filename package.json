@@ -45,7 +45,7 @@
     "@types/highlight.js": "^10.1.0",
     "@types/marked": "^4.0.8",
     "@types/node": "^18.0.0",
-    "@types/twemoji": "^13.1.1",
+    "@types/twemoji": "^13.1.2",
     "@types/vscode": "^1.80.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
