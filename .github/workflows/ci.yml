@@ -284,7 +284,6 @@ jobs:
       run: echo "✅ All CI checks passed successfully!"
 
     - name: Prepare coverage artifact
-      if: ${{ matrix.node-version == '20.x' && success() }}
       run: |
         set -e
         # nyc by default writes lcov to ./coverage/lcov.info; ensure it exists
