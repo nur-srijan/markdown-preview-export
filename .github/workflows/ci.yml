@@ -296,7 +296,6 @@ jobs:
         fi
 
     - name: Upload coverage results to Codecov
-      if: ${{ matrix.node-version == '20.x' && success() }}
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
