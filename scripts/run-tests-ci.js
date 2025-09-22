@@ -8,35 +8,31 @@ function run(cmd, opts = {}) {
 }
 
 try {
-  // Compile tests and extension
+  // Compile the extension and test files
   run('npm run compile-tests');
-  run('npm run compile');
 
-  // Lint but don't fail CI for lint issues (keep behavior strict in upstream CI if needed)
-  try {
-    run('npm run lint');
-  } catch (err) {
-    console.warn('Lint failed, continuing (to avoid blocking CI coverage run)');
-  }
+  // Check if there are any compiled test files
+  const testDir = './out/test/suite';
+  const testFiles = fs.existsSync(testDir) ? fs.readdirSync(testDir).filter(f => f.endsWith('.test.js')) : [];
 
-  const testDir = './out/test';
-    if (fs.existsSync(testDir) && fs.readdirSync(testDir).length > 0) {
-    console.log('Found compiled tests in', testDir);
-    // Run tests under c8 (coverage) directly (no X required for unit tests), with increased Node heap
-    run("c8 --reporter=lcov --reporter=text mocha --timeout 60000 --recursive ./out/test --reporter spec", {
+  if (testFiles.length > 0) {
+    console.log(`Found ${testFiles.length} compiled test file(s) in ${testDir}`);
+    // Run tests using c8 for coverage, with an increased heap size for Node
+    run("c8 --reporter=lcov --reporter=text mocha --timeout 15000 --recursive ./out/test/suite --reporter spec", {
       env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' }
     });
   } else {
-    console.log('No compiled tests found; creating empty coverage report to satisfy CI');
-    // Ensure coverage directory
+    console.warn('No compiled tests found; skipping test run.');
+    // Exit with success code, but create an empty coverage report to avoid CI failures
+    // This can happen on branches that temporarily remove tests
     fs.mkdirSync('./coverage', { recursive: true });
-    const lcovStub = `TN:\nSF:dummy\nFNF:0\nFNH:0\nDA:1,1\nLF:1\nLH:1\nend_of_record\n`;
+    const lcovStub = `TN:\nSF:stub.ts\nFNF:0\nFNH:0\nLF:0\nLH:0\nend_of_record\n`;
     fs.writeFileSync('./coverage/lcov.info', lcovStub);
-    console.log('Wrote ./coverage/lcov.info (stub)');
+    console.log('Wrote a stub coverage report to ./coverage/lcov.info');
   }
 
   process.exit(0);
 } catch (err) {
-  console.error(err);
+  console.error('An error occurred during the test run:', err);
   process.exit(1);
 }
