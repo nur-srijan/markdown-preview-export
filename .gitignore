@@ -8,7 +8,7 @@ dist/
 *.js.map
 *.d.ts
 !src/marked-katex-extension.d.ts
-!test/suite/glob.d.ts
+!src/test/suite/glob.d.ts
 assets/vendor/
 
 # VS Code

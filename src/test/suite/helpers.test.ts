@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { getChromeExecutableCandidates, getHtmlForWebview } from '../../src/helpers';
+import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers';
 
 suite('Helpers Test Suite', () => {
 
