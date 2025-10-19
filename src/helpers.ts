@@ -50,6 +50,17 @@ interface ExtendedMarkedOptions extends MarkedOptions {
 export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
     const renderer = new marked.Renderer();
 
+    // Ensure headings include stable id attributes for anchor links
+    (renderer as any).heading = (text: string, level: number, raw: string, slugger: any) => {
+        const id = slugger && typeof slugger.slug === 'function'
+            ? slugger.slug(raw)
+            : String(text)
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        return `<h${level} id="${id}">${text}</h${level}>`;
+    };
+
     renderer.code = (code: string, language: string | undefined) => {
         const lang = language || 'plaintext';
         try {
@@ -105,7 +116,8 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.use(markedKatex());
     marked.setOptions(markedOptions);
 
-    let htmlContent = marked.parse(markdownContent);
+    const withEmojis = isForPdf ? replaceEmojiShortcodes(markdownContent) : markdownContent;
+    let htmlContent = marked.parse(withEmojis);
 
     if (isForPdf) {
         htmlContent = twemoji.parse(htmlContent as string, {
@@ -310,4 +322,12 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     ${htmlContent}
 </body>
 </html>`;
+}
+
+// Minimal shortcode support for commonly used emoji in docs/tests
+function replaceEmojiShortcodes(input: string): string {
+    const shortcodeToUnicode: Record<string, string> = {
+        ':smile:': '\u{1F604}', // 😄
+    };
+    return input.replace(/:[a-z0-9_+-]+:/gi, (m) => shortcodeToUnicode[m.toLowerCase()] ?? m);
 }
