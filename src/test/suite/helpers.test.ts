@@ -7,7 +7,7 @@ suite('Helpers Test Suite', () => {
         const originalPlatform = process.platform;
         const originalEnv = { ...process.env };
 
-        afterEach(() => {
+        teardown(() => {
             Object.defineProperty(process, 'platform', {
                 value: originalPlatform
             });
