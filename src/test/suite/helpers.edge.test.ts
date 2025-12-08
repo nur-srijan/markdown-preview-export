@@ -1,40 +1,26 @@
 import * as assert from 'assert';
-import { marked } from 'marked';
-import twemoji from 'twemoji';
 import { getHtmlForWebview } from '../../helpers';
 
 suite('Helpers Edge Tests', () => {
 
-    suite('katex resilience', () => {
-        const originalParse = (marked as any).parse;
-
-        teardown(() => {
-            (marked as any).parse = originalParse;
-        });
-
-        test('throws when marked.parse fails', () => {
-            (marked as any).parse = () => { throw new Error('katex parse fail'); };
-            assert.throws(() => getHtmlForWebview('Inline math: $E=mc^2$', false), /katex parse fail/);
+    suite('marked parse resilience', () => {
+        test('throws when marked.parse fails via runtime injection', () => {
+            const runtime = { marked: { use: () => {}, setOptions: () => {}, parse: () => { throw new Error('katex parse fail'); } } };
+            assert.throws(() => getHtmlForWebview('Inline math: $E=mc^2$', false, undefined, runtime as any), /katex parse fail/);
         });
     });
 
     suite('twemoji variations', () => {
-        const originalTw = (twemoji as any).parse;
-
-        teardown(() => {
-            (twemoji as any).parse = originalTw;
-        });
-
-        test('accepts twemoji returning unchanged string', () => {
-            (twemoji as any).parse = (text: string) => text;
-            const html = getHtmlForWebview('Hello :smile:', true);
-            assert.ok(html.includes('Hello :smile:'));
+        test('accepts twemoji returning unchanged string via runtime injection', () => {
+            const runtime = { twemoji: { parse: (text: string) => text } };
+            const html = getHtmlForWebview('Hello 😄', true, undefined, runtime as any);
+            assert.ok(html.includes('Hello 😄'));
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });
 
-        test('uses provided base when twemoji returns img', () => {
-            (twemoji as any).parse = () => '<img class="emoji" src="https://cdn.example/1f604.svg">';
-            const html = getHtmlForWebview('Hello :smile:', true);
+        test('uses provided base when twemoji returns img via runtime injection', () => {
+            const runtime = { twemoji: { parse: () => '<img class="emoji" src="https://cdn.example/1f604.svg">' } };
+            const html = getHtmlForWebview('Hello 😄', true, undefined, runtime as any);
             assert.ok(html.includes('https://cdn.example/1f604.svg'));
             assert.ok(html.includes('<img class="emoji"'));
         });

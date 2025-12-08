@@ -5,16 +5,15 @@ import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers'
 suite('Helpers Extra Tests', () => {
 
     suite('renderer code fallback', () => {
-        const originalHighlight = (hljs as any).highlight;
-
-        teardown(() => {
-            (hljs as any).highlight = originalHighlight;
-        });
-
         test('falls back to raw code when highlight throws', () => {
-            (hljs as any).highlight = () => { throw new Error('boom'); };
             const markdown = "```js\nconsole.log('x');\n```";
-            const html = getHtmlForWebview(markdown);
+            const runtime = {
+                hljs: {
+                    getLanguage: () => true,
+                    highlight: () => { throw new Error('boom'); }
+                }
+            };
+            const html = getHtmlForWebview(markdown, false, undefined, runtime as any);
             assert.ok(html.includes("console.log('x');"));
             assert.strictEqual(html.includes('hljs'), false);
         });

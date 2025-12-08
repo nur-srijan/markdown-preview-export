@@ -47,14 +47,17 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
-    const renderer = new marked.Renderer();
+export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string, runtime?: { hljs?: any; twemoji?: any; marked?: any }): string {
+    const runtimeMarked = runtime && runtime.marked ? runtime.marked : marked;
+    const renderer = new runtimeMarked.Renderer();
+    const runtimeHljs = runtime && runtime.hljs ? runtime.hljs : hljs;
+    const runtimeTwemoji = runtime && runtime.twemoji ? runtime.twemoji : twemoji;
 
     renderer.code = (code: string, language: string | undefined) => {
         const lang = language || 'plaintext';
         try {
-            const validLanguage = hljs.getLanguage(lang) ? lang : 'plaintext';
-            const highlightedCode = hljs.highlight(code, { language: validLanguage }).value;
+            const validLanguage = runtimeHljs.getLanguage(lang) ? lang : 'plaintext';
+            const highlightedCode = runtimeHljs.highlight(code, { language: validLanguage }).value;
 
             return `
                 <div class="code-block">
@@ -91,8 +94,8 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     const markedOptions: ExtendedMarkedOptions = {
         renderer,
         highlight: function(code: string, lang: string) {
-            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-            return hljs.highlight(code, { language }).value;
+            const language = runtimeHljs.getLanguage(lang) ? lang : 'plaintext';
+            return runtimeHljs.highlight(code, { language }).value;
         },
         langPrefix: 'hljs language-',
         gfm: true,
@@ -102,13 +105,13 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
         xhtml: false
     };
 
-    marked.use(markedKatex());
-    marked.setOptions(markedOptions);
+    runtimeMarked.use(markedKatex());
+    runtimeMarked.setOptions(markedOptions);
 
-    let htmlContent = marked.parse(markdownContent);
+    let htmlContent = runtimeMarked.parse(markdownContent);
 
     if (isForPdf) {
-        htmlContent = twemoji.parse(htmlContent as string, {
+        htmlContent = runtimeTwemoji.parse(htmlContent as string, {
             folder: 'svg',
             ext: '.svg',
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
