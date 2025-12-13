@@ -26,7 +26,7 @@ jobs:
         cache: 'npm'
     
     - name: Install updated dependencies
-      run: npm ci
+      run: npm install && npm ci
     
     - name: Check for breaking changes in Puppeteer
       run: |
@@ -173,7 +173,7 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm install && npm ci
     
     - name: Install xvfb
       run: sudo apt-get update && sudo apt-get install -y xvfb
