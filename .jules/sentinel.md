@@ -1,0 +1,4 @@
+## 2024-05-23 - [Stored XSS in Markdown Preview]
+**Vulnerability:** Markdown content was parsed to HTML using `marked` and then directly injected into a WebView with `enableScripts: true` without sanitization. This allowed execution of malicious scripts embedded in markdown files.
+**Learning:** Even if `marked` is used, the output is raw HTML. When displaying this HTML in a context where scripts are enabled (like a VS Code WebView with `enableScripts: true`), it MUST be sanitized.
+**Prevention:** Always sanitize HTML derived from user input before injecting it into the DOM, especially when `enableScripts` is true. Used `isomorphic-dompurify` to sanitize while allowing necessary tags and attributes. Refactored inline `onclick` handlers (which are unsafe and removed by sanitizers) to use event delegation.

@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -60,7 +61,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -75,7 +76,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -105,10 +106,18 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.use(markedKatex());
     marked.setOptions(markedOptions);
 
-    let htmlContent = marked.parse(markdownContent);
+    let htmlContent = marked.parse(markdownContent) as string;
+
+    // Sanitize HTML to prevent XSS
+    htmlContent = DOMPurify.sanitize(htmlContent, {
+        ADD_TAGS: ['img', 'code', 'pre', 'span', 'div', 'button', 'svg', 'rect', 'path', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'p', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'strong', 'em', 'del', 'br', 'hr', 'input'],
+        ADD_ATTR: ['class', 'src', 'href', 'title', 'alt', 'target', 'rel', 'id', 'width', 'height', 'viewBox', 'fill', 'stroke', 'stroke-width', 'x', 'y', 'rx', 'ry', 'd', 'style'],
+        FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form'],
+        FORBID_ATTR: ['onerror', 'onload', 'onmouseover', 'onclick']
+    });
 
     if (isForPdf) {
-        htmlContent = twemoji.parse(htmlContent as string, {
+        htmlContent = twemoji.parse(htmlContent, {
             folder: 'svg',
             ext: '.svg',
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
@@ -136,6 +145,11 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                     hljs.highlightElement(block);
                 }
             });
+
+            // Initialize copy buttons
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', () => copyToClipboard(button));
+            });
         });
 
         // Copy to clipboard function
@@ -143,12 +157,12 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
             const codeBlock = button.closest('.code-block');
             const code = codeBlock.querySelector('code').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                const originalText = button.textContent;
+                const originalText = button.innerHTML;
                 button.textContent = 'Copied!';
                 button.style.backgroundColor = '#4CAF50';
                 button.style.color = 'white';
                 setTimeout(() => {
-                    button.textContent = originalText;
+                    button.innerHTML = originalText;
                     button.style.backgroundColor = '';
                     button.style.color = '';
                 }, 2000);
