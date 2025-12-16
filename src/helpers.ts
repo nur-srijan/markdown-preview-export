@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -106,6 +107,32 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.setOptions(markedOptions);
 
     let htmlContent = marked.parse(markdownContent);
+
+    // Sanitize HTML using DOMPurify
+    // Allow MathML tags for KaTeX and standard HTML tags
+    const sanitizedHtml = DOMPurify.sanitize(htmlContent as string, {
+        ADD_TAGS: [
+            // MathML tags
+            'math', 'maction', 'maligngroup', 'malignmark', 'menclose', 'merror',
+            'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv',
+            'mmultiscripts', 'mn', 'mo', 'mover', 'mpadded', 'mphantom',
+            'mroot', 'mrow', 'ms', 'mscarries', 'mscarry', 'msgroup',
+            'msline', 'mspace', 'msqrt', 'msrow', 'mstack', 'mstyle',
+            'msub', 'msubsup', 'msup', 'mtable', 'mtd', 'mtext',
+            'mtr', 'munder', 'munderover', 'semantics', 'annotation', 'annotation-xml',
+            // Custom code block elements (if not already allowed)
+            'button', 'svg', 'rect', 'path'
+        ],
+        ADD_ATTR: [
+            // SVG attributes
+            'viewBox', 'fill', 'stroke', 'stroke-width', 'x', 'y', 'width', 'height', 'rx', 'ry', 'd',
+            // MathML attributes might be needed, but DOMPurify supports MathML by default usually?
+            // Let's add common ones just in case.
+            'xmlns', 'display', 'mathvariant', 'encoding'
+        ]
+    });
+
+    htmlContent = sanitizedHtml;
 
     if (isForPdf) {
         htmlContent = twemoji.parse(htmlContent as string, {
