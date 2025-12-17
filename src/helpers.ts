@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -106,6 +107,31 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.setOptions(markedOptions);
 
     let htmlContent = marked.parse(markdownContent);
+
+    // Sanitize HTML
+    htmlContent = DOMPurify.sanitize(htmlContent as string, {
+        ADD_TAGS: [
+            // MathML tags
+            'math', 'maction', 'maligngroup', 'malignmark', 'menclose', 'merror',
+            'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv',
+            'mmultiscripts', 'mn', 'mo', 'mover', 'mpadded', 'mphantom',
+            'mroot', 'mrow', 'ms', 'mscarries', 'mscarry', 'msgroup', 'msline',
+            'mspace', 'msqrt', 'msrow', 'mstack', 'mstyle', 'msub', 'msubsup',
+            'msup', 'mtable', 'mtd', 'mtext', 'mtr', 'munder', 'munderover',
+            'semantics', 'annotation', 'annotation-xml'
+        ],
+        ADD_ATTR: [
+            // MathML attributes
+            'mathvariant', 'encoding', 'xmlns', 'display', 'actiontype',
+            'columnalign', 'columnspacing', 'columnlines', 'rowalign', 'rowspacing',
+            'rowlines', 'framespacing', 'frame', 'equalrows', 'equalcolumns',
+            'displaystyle', 'scriptlevel', 'linethickness', 'stretchy', 'movablelimits',
+            'largeop', 'minlabelspacing',
+
+            // Other attributes needed for styling and code blocks
+            'class', 'style', 'id'
+        ]
+    });
 
     if (isForPdf) {
         htmlContent = twemoji.parse(htmlContent as string, {

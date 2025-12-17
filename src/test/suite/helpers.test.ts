@@ -7,7 +7,7 @@ suite('Helpers Test Suite', () => {
         const originalPlatform = process.platform;
         const originalEnv = { ...process.env };
 
-        afterEach(() => {
+        teardown(() => {
             Object.defineProperty(process, 'platform', {
                 value: originalPlatform
             });
@@ -98,6 +98,12 @@ suite('Helpers Test Suite', () => {
             const markdown = 'Hello :smile:';
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
+        });
+
+        test('should sanitize XSS', () => {
+            const markdown = '<script>alert("XSS")</script>';
+            const html = getHtmlForWebview(markdown);
+            assert.strictEqual(html.includes('<script>alert("XSS")</script>'), false);
         });
     });
 });
