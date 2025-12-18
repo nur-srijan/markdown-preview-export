@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Unsanitized Markdown Preview
+**Vulnerability:** The Markdown preview feature was taking raw markdown, converting it to HTML via `marked`, and injecting it directly into a VS Code Webview with `enableScripts: true`. This allowed for Stored XSS if a user opened a malicious markdown file containing `<script>` tags.
+**Learning:** Even though `marked` is a popular library, it does NOT sanitize output by default (and removed its sanitization feature years ago). VS Code Webviews are isolated but with `enableScripts: true`, they are vulnerable to XSS which can be used to spoof UI or potentially access local resources if configured permissively.
+**Prevention:** Always use a dedicated sanitizer like `isomorphic-dompurify` on any HTML generated from user input before displaying it, especially in a Webview.

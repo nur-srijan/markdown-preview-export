@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers';
+import { suite, test, afterEach } from 'mocha';
 
 suite('Helpers Test Suite', () => {
 
@@ -98,6 +99,18 @@ suite('Helpers Test Suite', () => {
             const markdown = 'Hello :smile:';
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
+        });
+
+        test('should sanitize XSS attempts', () => {
+            const markdown = 'Some text <script>alert("xss")</script>';
+            const html = getHtmlForWebview(markdown);
+
+            // Check that the malicious script is removed
+            assert.strictEqual(html.includes('<script>alert("xss")</script>'), false, 'Malicious script tag should be removed');
+
+            // Check that legitimate scripts (from template) might still exist, so we don't check for !html.includes('<script>')
+            // But we verify content preservation
+            assert.ok(html.includes('Some text'), 'Content should be preserved');
         });
     });
 });

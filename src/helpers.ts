@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -105,15 +106,21 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.use(markedKatex());
     marked.setOptions(markedOptions);
 
-    let htmlContent = marked.parse(markdownContent);
+    let htmlContent = marked.parse(markdownContent) as string;
 
     if (isForPdf) {
-        htmlContent = twemoji.parse(htmlContent as string, {
+        htmlContent = twemoji.parse(htmlContent, {
             folder: 'svg',
             ext: '.svg',
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
         }) as string;
     }
+
+    // Sanitize HTML to prevent XSS
+    htmlContent = DOMPurify.sanitize(htmlContent, {
+        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mtable', 'mtr', 'mtd'], // Allow MathML tags for KaTeX
+        ADD_ATTR: ['xmlns', 'display', 'mathvariant', 'columnalign', 'stretchy', 'linethickness'] // Allow MathML attributes
+    });
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
 
