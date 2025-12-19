@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -114,6 +115,12 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
         }) as string;
     }
+
+    // Sanitize HTML
+    htmlContent = DOMPurify.sanitize(htmlContent as string, {
+        ADD_TAGS: ['math', 'maction', 'maligngroup', 'malignmark', 'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv', 'mmultiscripts', 'mn', 'mo', 'mover', 'mpadded', 'mphantom', 'mroot', 'mrow', 'ms', 'mscarries', 'mscarry', 'msgroup', 'msline', 'mspace', 'msqrt', 'msrow', 'mstack', 'mstyle', 'msub', 'msubsup', 'msup', 'mtable', 'mtd', 'mtext', 'mtr', 'munder', 'munderover', 'semantics', 'annotation', 'annotation-xml'],
+        ADD_ATTR: ['xmlns', 'display', 'class', 'style', 'height', 'width', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'rx', 'ry']
+    });
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
 

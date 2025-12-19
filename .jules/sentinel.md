@@ -1,0 +1,4 @@
+## 2024-05-23 - Stored XSS in Markdown Preview
+**Vulnerability:** The `getHtmlForWebview` function in `src/helpers.ts` was taking raw HTML output from `marked` and injecting it directly into the webview HTML without sanitization. Since the webview had `enableScripts: true` set in `src/extension.ts`, this allowed arbitrary JavaScript execution via malicious Markdown (e.g., `<script>`).
+**Learning:** Even if a project uses "safe" defaults, explicit configuration like `enableScripts: true` can open up major holes. Always sanitize user-generated content before rendering it in a privileged context. The memories mentioned sanitization was present, but it was missing from the actual code and dependencies.
+**Prevention:** I installed `isomorphic-dompurify` and applied it to the HTML output before injection. I also configured it to explicitly allow MathML and SVG tags to preserve the functionality of KaTeX and Twemoji.
