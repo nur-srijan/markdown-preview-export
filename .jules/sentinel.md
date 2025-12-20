@@ -1,0 +1,4 @@
+## 2024-05-22 - Missing HTML Sanitization in Markdown Preview
+**Vulnerability:** The application was taking user-provided Markdown, converting it to HTML using `marked`, and rendering it in a Webview with `enableScripts: true` without any sanitization. This allowed arbitrary JavaScript execution (XSS) via `<script>` tags or event handlers.
+**Learning:** Even if `marked` is used, it does not sanitize HTML by default (especially with `gfm: true` or if raw HTML is enabled). Relying on memory or documentation that says "it is sanitized" without checking the code is dangerous.
+**Prevention:** Always verify sanitization is present in the code path. Use `isomorphic-dompurify` to sanitize HTML before rendering it in a Webview. Explicitly configure allowed tags and attributes to support rich features like Math and Code highlighting while blocking dangerous content.
