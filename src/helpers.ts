@@ -21,7 +21,10 @@ export function getChromeExecutableCandidates(): string[] {
     } else if (platform === 'darwin') {
         candidates.push(
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            '/Applications/Chromium.app/Contents/MacOS/Chromium'
+            '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+            '/Applications/Comet.app/Contents/MacOS/Comet',
+            '/Applications/Dia.app/Contents/MacOS/Dia'
         );
     } else if (platform === 'win32') {
         candidates.push(

@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as mocha from 'mocha';
 import * as glob from 'glob';
 
 export function run(): Promise<void> {
