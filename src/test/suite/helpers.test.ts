@@ -92,7 +92,7 @@ suite('Helpers Test Suite', () => {
             const markdown = 'Hello ☺️';
             const html = getHtmlForWebview(markdown, true);
             assert.ok(html.includes('<img class="emoji"'));
-            assert.ok(html.includes('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f60a.svg'));
+            assert.ok(html.includes('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/263a.svg'));
         });
 
         test('should NOT parse twemoji when isForPdf is false', () => {
