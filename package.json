@@ -41,6 +41,14 @@
     "test": "vscode-test",
     "test:ci": "node ./scripts/run-tests-ci.js"
   },
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.22",
+    "marked": "^11.2.0",
+    "marked-katex-extension": "^5.1.4",
+    "isomorphic-dompurify": "^2.34.0",
+    "puppeteer": "^22.0.0"
+  },
   "devDependencies": {
     "@types/chai": "^4.3.4",
     "@types/glob": "^9.0.0",
@@ -118,12 +126,5 @@
         }
       ]
     }
-  },
-  "dependencies": {
-    "highlight.js": "^11.11.1",
-    "katex": "^0.16.22",
-    "marked": "^11.2.0",
-    "marked-katex-extension": "^5.1.4",
-    "puppeteer": "^22.0.0"
   }
 }

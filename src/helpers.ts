@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -105,10 +106,18 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.use(markedKatex());
     marked.setOptions(markedOptions);
 
-    let htmlContent = marked.parse(markdownContent);
+    let htmlContent = marked.parse(markdownContent) as string;
+
+    // Sanitize the HTML content
+    // We need to allow specific tags and attributes for KaTeX and highlighting
+    htmlContent = DOMPurify.sanitize(htmlContent, {
+        USE_PROFILES: { html: true },
+        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect'],
+        ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class'],
+    });
 
     if (isForPdf) {
-        htmlContent = twemoji.parse(htmlContent as string, {
+        htmlContent = twemoji.parse(htmlContent, {
             folder: 'svg',
             ext: '.svg',
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
