@@ -1,4 +1,5 @@
 import * as process from 'process';
+import * as path from 'path';
 import { marked } from 'marked';
 import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
@@ -51,8 +52,43 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
+export function getHtmlForWebview(
+    markdownContent: string,
+    isForPdf: boolean = false,
+    assetBase?: string,
+    documentPath?: string,
+    workspaceRoot?: string,
+    imageResolver?: (href: string) => string
+): string {
     const renderer = new marked.Renderer();
+
+    renderer.image = (href: string | null, title: string | null, text: string) => {
+        if (!href) {
+            return `<img src="" alt="${text}" title="${title || ''}">`;
+        }
+
+        let resolvedHref = href;
+
+        // Resolve absolute paths (starting with /) relative to workspace root
+        if (href.startsWith('/') && workspaceRoot) {
+            resolvedHref = path.join(workspaceRoot, href);
+        }
+        // Resolve relative paths relative to document directory
+        else if (!href.match(/^[a-z]+:\/\//i) && documentPath) {
+            const documentDir = path.dirname(documentPath);
+            resolvedHref = path.resolve(documentDir, href);
+        }
+
+        // Use custom resolver if provided
+        if (imageResolver) {
+            resolvedHref = imageResolver(resolvedHref);
+        } else if (path.isAbsolute(resolvedHref) && !resolvedHref.startsWith('http')) {
+            // Default to file:// for absolute paths if no resolver provided (mainly for exports)
+            resolvedHref = `file://${resolvedHref}`;
+        }
+
+        return `<img src="${resolvedHref}" alt="${text}" title="${title || ''}">`;
+    };
 
     renderer.code = (code: string, language: string | undefined) => {
         const lang = language || 'plaintext';
@@ -94,7 +130,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
 
     const markedOptions: ExtendedMarkedOptions = {
         renderer,
-        highlight: function(code: string, lang: string) {
+        highlight: function (code: string, lang: string) {
             const language = hljs.getLanguage(lang) ? lang : 'plaintext';
             return hljs.highlight(code, { language }).value;
         },
@@ -117,6 +153,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
         USE_PROFILES: { html: true },
         ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect'],
         ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class'],
+        ALLOW_UNKNOWN_PROTOCOLS: true,
     });
 
     if (isForPdf) {

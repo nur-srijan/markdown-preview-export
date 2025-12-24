@@ -101,4 +101,34 @@ suite('Helpers Test Suite', () => {
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });
     });
+
+    suite('Image Path Resolution', () => {
+        const workspaceRoot = '/path/to/workspace';
+        const documentPath = '/path/to/workspace/docs/readme.md';
+
+        test('should resolve root-relative paths relative to workspace root', () => {
+            const markdown = '![alt](/images/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="file:///path/to/workspace/images/test.png"'));
+        });
+
+        test('should resolve relative paths relative to document directory', () => {
+            const markdown = '![alt](images/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="file:///path/to/workspace/docs/images/test.png"'));
+        });
+
+        test('should use imageResolver if provided', () => {
+            const markdown = '![alt](/images/test.png)';
+            const imageResolver = (href: string) => `webview-uri://${href}`;
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot, imageResolver);
+            assert.ok(html.includes('src="webview-uri:///path/to/workspace/images/test.png"'));
+        });
+
+        test('should not change external URLs', () => {
+            const markdown = '![alt](https://example.com/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="https://example.com/test.png"'));
+        });
+    });
 });
