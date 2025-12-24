@@ -124,12 +124,12 @@ export function activate(context: vscode.ExtensionContext) {
     // Register the command
     const disposable = vscode.commands.registerCommand('markdown-rich-preview.showPreview', () => {
         const editor = vscode.window.activeTextEditor;
-        
+
         if (!editor || editor.document.languageId !== 'markdown') {
             vscode.window.showErrorMessage('Please open a markdown file first');
             return;
         }
-        
+
         // Create and show webview panel
         const panel = vscode.window.createWebviewPanel(
             'markdown-rich-preview',
@@ -142,23 +142,23 @@ export function activate(context: vscode.ExtensionContext) {
                 ]
             }
         );
-        
-    // Initial update
-    updateContent(panel, editor.document, context);
-        
+
+        // Initial update
+        updateContent(panel, editor.document, context);
+
         // Update content when the document changes
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
-        if (e.document.uri.toString() === editor.document.uri.toString()) {
+            if (e.document.uri.toString() === editor.document.uri.toString()) {
                 updateContent(panel, e.document, context);
             }
         });
-        
+
         // Clean up resources when panel is closed
         panel.onDidDispose(() => {
             changeDocumentSubscription.dispose();
         });
     });
-    
+
     context.subscriptions.push(disposable);
 
     // Register the export to HTML command
@@ -171,9 +171,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const markdownContent = editor.document.getText();
+        const workspaceRoot = vscode.workspace.getWorkspaceFolder(editor.document.uri)?.uri.fsPath;
         // For exported HTML we can reference local files via file://
         const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
-        const htmlContent = getHtmlForWebview(markdownContent, false, assetBaseForExport);
+        const htmlContent = getHtmlForWebview(markdownContent, false, assetBaseForExport, editor.document.fileName, workspaceRoot);
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.html';
         const uri = await vscode.window.showSaveDialog({
@@ -206,10 +207,11 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const markdownContent = editor.document.getText();
-    // Pass true for isForPdf to include PDF-specific styles
-    // For PDF export we prefer absolute file URIs so Puppeteer can load local assets
-    const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
-    const htmlContent = getHtmlForWebview(markdownContent, true, assetBaseForExport);
+        const workspaceRoot = vscode.workspace.getWorkspaceFolder(editor.document.uri)?.uri.fsPath;
+        // Pass true for isForPdf to include PDF-specific styles
+        // For PDF export we prefer absolute file URIs so Puppeteer can load local assets
+        const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
+        const htmlContent = getHtmlForWebview(markdownContent, true, assetBaseForExport, editor.document.fileName, workspaceRoot);
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.pdf';
         const uri = await vscode.window.showSaveDialog({
@@ -231,20 +233,20 @@ export function activate(context: vscode.ExtensionContext) {
                     try {
                         const browser = await getBrowserInstance();
                         page = await browser.newPage();
-                        
+
                         // Set a timeout for page operations
                         page.setDefaultNavigationTimeout(30000);
-                        
+
                         // Use domcontentloaded for faster rendering since we're not waiting for network resources
                         await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
-                        
+
                         // Wait for any remaining resources to load (with a timeout)
                         try {
                             await page.waitForNetworkIdle({ timeout: 2000 });
                         } catch (e) {
                             // Ignore timeout errors, proceed with what we have
                         }
-                        
+
                         const pdfBuffer = await page.pdf({
                             format: 'A4',
                             printBackground: true,
@@ -294,13 +296,20 @@ function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument
     }
 
     // Convert markdown to HTML, preferring bundled assets for the webview
-    const html = getHtmlForWebview(markdownContent, false, assetBase);
+    const workspaceRoot = vscode.workspace.getWorkspaceFolder(document.uri)?.uri.fsPath;
+    const imageResolver = (href: string) => {
+        if (path.isAbsolute(href)) {
+            return panel.webview.asWebviewUri(vscode.Uri.file(href)).toString();
+        }
+        return href;
+    };
+    const html = getHtmlForWebview(markdownContent, false, assetBase, document.fileName, workspaceRoot, imageResolver);
 
     // Update webview content
     panel.webview.html = html;
 }
 
-    
+
 
 export function deactivate() {
     void cleanupBrowser();
