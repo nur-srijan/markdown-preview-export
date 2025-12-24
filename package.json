@@ -38,7 +38,7 @@
     "build:assets": "node ./scripts/copy-vendor.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test",
+    "test": "node ./out/test/runTest.js",
     "test:ci": "node ./scripts/run-tests-ci.js"
   },
   "dependencies": {
