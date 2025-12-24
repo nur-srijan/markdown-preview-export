@@ -74,7 +74,7 @@ export function getHtmlForWebview(
             resolvedHref = path.join(workspaceRoot, href);
         }
         // Resolve relative paths relative to document directory
-        else if (!href.match(/^[a-z]+:\/\//i) && documentPath) {
+        else if (!href.startsWith('/') && !href.match(/^[a-z]+:\/\//i) && documentPath) {
             const documentDir = path.dirname(documentPath);
             resolvedHref = path.resolve(documentDir, href);
         }
