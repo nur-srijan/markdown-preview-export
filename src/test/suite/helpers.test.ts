@@ -100,5 +100,14 @@ suite('Helpers Test Suite', () => {
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });
+
+        test('should include Content Security Policy (CSP)', () => {
+            const markdown = 'test';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('<meta http-equiv="Content-Security-Policy"'));
+            assert.ok(html.includes("default-src 'none'"));
+            assert.ok(html.includes("script-src 'nonce-"));
+            assert.ok(html.includes("style-src 'self' 'unsafe-inline'"));
+        });
     });
 });
