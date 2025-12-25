@@ -1,4 +1,5 @@
 import * as process from 'process';
+import * as crypto from 'crypto';
 import { marked } from 'marked';
 import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
@@ -128,17 +129,19 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     }
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+    const nonce = crypto.randomBytes(16).toString('base64');
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src * data:; style-src 'unsafe-inline' *; script-src 'nonce-${nonce}'; font-src *;">
     <title>Markdown: Rich Preview</title>
     <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
     <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
-    <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
-    <script>
+    <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}" nonce="${nonce}"></script>
+    <script nonce="${nonce}">
         // Initialize highlight.js
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('pre code').forEach((block) => {

@@ -100,5 +100,12 @@ suite('Helpers Test Suite', () => {
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });
+
+        test('should include Content Security Policy', () => {
+            const markdown = 'CSP check';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('<meta http-equiv="Content-Security-Policy"'), 'CSP meta tag missing');
+            assert.ok(html.includes("script-src 'nonce-"), 'CSP should use nonce for scripts');
+        });
     });
 });
