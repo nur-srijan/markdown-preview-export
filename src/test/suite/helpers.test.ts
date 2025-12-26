@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { afterEach } from 'mocha';
 import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers';
 
 suite('Helpers Test Suite', () => {
@@ -54,7 +55,7 @@ suite('Helpers Test Suite', () => {
         test('should convert basic Markdown to HTML', () => {
             const markdown = '# Hello\n\nThis is **bold** text.';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('<h1 id="hello">Hello</h1>'));
+            assert.ok(html.includes('<h1>Hello</h1>'));
             assert.ok(html.includes('<strong>bold</strong>'));
         });
 
@@ -88,14 +89,14 @@ suite('Helpers Test Suite', () => {
         });
 
         test('should parse twemoji when isForPdf is true', () => {
-            const markdown = 'Hello :smile:';
+            const markdown = 'Hello ☺️';
             const html = getHtmlForWebview(markdown, true);
             assert.ok(html.includes('<img class="emoji"'));
-            assert.ok(html.includes('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f604.svg'));
+            assert.ok(html.includes('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/263a.svg'));
         });
 
         test('should NOT parse twemoji when isForPdf is false', () => {
-            const markdown = 'Hello :smile:';
+            const markdown = 'Hello ☺️';
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });

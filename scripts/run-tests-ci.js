@@ -18,9 +18,8 @@ try {
   if (testFiles.length > 0) {
     console.log(`Found ${testFiles.length} compiled test file(s) in ${testDir}`);
     // Run tests using c8 for coverage, with an increased heap size for Node
-    // Use Mocha's TDD interface so `suite`/`test` globals are available
     run("c8 --reporter=lcov --reporter=text mocha --ui tdd --timeout 15000 --recursive ./out/test/suite --reporter spec", {
-      env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' }
+      env: { ...process.env }
     });
   } else {
     console.warn('No compiled tests found; skipping test run.');

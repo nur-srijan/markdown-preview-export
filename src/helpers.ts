@@ -4,6 +4,7 @@ import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -20,7 +21,10 @@ export function getChromeExecutableCandidates(): string[] {
     } else if (platform === 'darwin') {
         candidates.push(
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            '/Applications/Chromium.app/Contents/MacOS/Chromium'
+            '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+            '/Applications/Comet.app/Contents/MacOS/Comet',
+            '/Applications/Dia.app/Contents/MacOS/Dia'
         );
     } else if (platform === 'win32') {
         candidates.push(
@@ -117,10 +121,18 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     marked.setOptions(markedOptions);
 
     const withEmojis = isForPdf ? replaceEmojiShortcodes(markdownContent) : markdownContent;
-    let htmlContent = marked.parse(withEmojis);
+    let htmlContent = marked.parse(withEmojis)as string;
+  
+    // Sanitize the HTML content
+    // We need to allow specific tags and attributes for KaTeX and highlighting
+    htmlContent = DOMPurify.sanitize(htmlContent, {
+        USE_PROFILES: { html: true },
+        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect'],
+        ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class'],
+    });
 
     if (isForPdf) {
-        htmlContent = twemoji.parse(htmlContent as string, {
+        htmlContent = twemoji.parse(htmlContent, {
             folder: 'svg',
             ext: '.svg',
             base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
