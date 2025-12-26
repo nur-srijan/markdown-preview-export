@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { afterEach } from 'mocha';
 import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers';
 
 suite('Helpers Test Suite', () => {
@@ -8,7 +7,7 @@ suite('Helpers Test Suite', () => {
         const originalPlatform = process.platform;
         const originalEnv = { ...process.env };
 
-        afterEach(() => {
+        teardown(() => {
             Object.defineProperty(process, 'platform', {
                 value: originalPlatform
             });
