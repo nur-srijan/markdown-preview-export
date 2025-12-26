@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { afterEach } from 'mocha';
 import { getChromeExecutableCandidates, getHtmlForWebview } from '../../helpers';
 
 suite('Helpers Test Suite', () => {
