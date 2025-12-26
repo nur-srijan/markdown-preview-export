@@ -1,4 +1,5 @@
 import * as process from 'process';
+import * as crypto from 'crypto';
 import { marked } from 'marked';
 import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
@@ -51,7 +52,7 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
+export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string, cspSource?: string): string {
     const renderer = new marked.Renderer();
 
     renderer.code = (code: string, language: string | undefined) => {
@@ -128,17 +129,26 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     }
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+    const nonce = crypto.randomBytes(16).toString('base64');
+    const cspSourceParam = cspSource || '*';
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none';
+        img-src ${cspSourceParam} https: data:;
+        script-src ${cspSourceParam} https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'nonce-${nonce}';
+        style-src ${cspSourceParam} https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline';
+        font-src ${cspSourceParam} https:;
+    ">
     <title>Markdown: Rich Preview</title>
     <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
     <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
     <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
-    <script>
+    <script nonce="${nonce}">
         // Initialize highlight.js
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('pre code').forEach((block) => {
