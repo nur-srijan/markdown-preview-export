@@ -5,6 +5,7 @@ import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
 import DOMPurify from 'isomorphic-dompurify';
+import * as crypto from 'crypto';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -51,7 +52,7 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
+export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string, cspSource?: string): string {
     const renderer = new marked.Renderer();
 
     renderer.code = (code: string, language: string | undefined) => {
@@ -64,7 +65,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -79,7 +80,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -128,17 +129,20 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     }
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+    const nonce = crypto.randomBytes(16).toString('base64');
+    const safeCspSource = cspSource || 'https:';
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${safeCspSource} https: data:; style-src ${safeCspSource} 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; script-src 'nonce-${nonce}' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src ${safeCspSource} https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown: Rich Preview</title>
     <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
     <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
     <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
-    <script>
+    <script nonce="${nonce}">
         // Initialize highlight.js
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('pre code').forEach((block) => {
@@ -148,6 +152,14 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                     hljs.highlightElement(block);
                 }
             });
+
+            // Event delegation for copy buttons
+            document.addEventListener('click', (e) => {
+                const button = e.target.closest('.copy-button');
+                if (button) {
+                    copyToClipboard(button);
+                }
+            });
         });
 
         // Copy to clipboard function
@@ -155,12 +167,12 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
             const codeBlock = button.closest('.code-block');
             const code = codeBlock.querySelector('code').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                const originalText = button.textContent;
+                const originalText = button.innerHTML;
                 button.textContent = 'Copied!';
                 button.style.backgroundColor = '#4CAF50';
                 button.style.color = 'white';
                 setTimeout(() => {
-                    button.textContent = originalText;
+                    button.innerHTML = originalText;
                     button.style.backgroundColor = '';
                     button.style.color = '';
                 }, 2000);
