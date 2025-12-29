@@ -43,11 +43,12 @@
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
+    "isomorphic-dompurify": "^2.34.0",
     "katex": "^0.16.22",
     "marked": "^11.2.0",
     "marked-katex-extension": "^5.1.4",
-    "isomorphic-dompurify": "^2.34.0",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^22.0.0",
+    "twemoji": "^14.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
