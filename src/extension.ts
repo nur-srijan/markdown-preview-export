@@ -294,7 +294,7 @@ function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument
     }
 
     // Convert markdown to HTML, preferring bundled assets for the webview
-    const html = getHtmlForWebview(markdownContent, false, assetBase);
+    const html = getHtmlForWebview(markdownContent, false, assetBase, panel.webview.cspSource);
 
     // Update webview content
     panel.webview.html = html;
