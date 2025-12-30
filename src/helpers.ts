@@ -1,4 +1,5 @@
 import * as process from 'process';
+import * as crypto from 'crypto';
 import { marked } from 'marked';
 import type { MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
@@ -51,7 +52,7 @@ interface ExtendedMarkedOptions extends MarkedOptions {
     xhtml?: boolean;
 }
 
-export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string): string {
+export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = false, assetBase?: string, cspSource?: string): string {
     const renderer = new marked.Renderer();
 
     renderer.code = (code: string, language: string | undefined) => {
@@ -64,7 +65,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -79,7 +80,7 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                 <div class="code-block">
                     <div class="code-header">
                         <span class="language">${lang}</span>
-                        <button class="copy-button" onclick="copyToClipboard(this)" title="Copy to clipboard">
+                        <button class="copy-button" title="Copy to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -115,8 +116,8 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
     // We need to allow specific tags and attributes for KaTeX and highlighting
     htmlContent = DOMPurify.sanitize(htmlContent, {
         USE_PROFILES: { html: true },
-        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect'],
-        ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class'],
+        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect', 'button'],
+        ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class', 'title'],
     });
 
     if (isForPdf) {
@@ -129,16 +130,45 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
 
     const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
 
+    // Generate nonce for CSP
+    const nonce = crypto.randomBytes(16).toString('base64');
+
+    // Construct CSP
+    const cspStyleSrc = [
+        "'unsafe-inline'", // Required for highlight.js and other inline styles
+        cspSource,
+        'https://cdnjs.cloudflare.com',
+        'https://cdn.jsdelivr.net'
+    ].filter(Boolean).join(' ');
+
+    const cspScriptSrc = [
+        `'nonce-${nonce}'`,
+        'https://cdnjs.cloudflare.com',
+        'https://cdn.jsdelivr.net'
+    ].filter(Boolean).join(' ');
+
+    const cspImgSrc = [
+        cspSource,
+        'https:',
+        'data:'
+    ].filter(Boolean).join(' ');
+
+    const cspFontSrc = [
+        cspSource,
+        'https:'
+    ].filter(Boolean).join(' ');
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspStyleSrc}; script-src ${cspScriptSrc}; img-src ${cspImgSrc}; font-src ${cspFontSrc};">
     <title>Markdown: Rich Preview</title>
     <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
     <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
     <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
-    <script>
+    <script nonce="${nonce}">
         // Initialize highlight.js
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('pre code').forEach((block) => {
@@ -148,6 +178,11 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
                     hljs.highlightElement(block);
                 }
             });
+
+            // Attach copy button event listeners
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', () => copyToClipboard(button));
+            });
         });
 
         // Copy to clipboard function
@@ -155,12 +190,13 @@ export function getHtmlForWebview(markdownContent: string, isForPdf: boolean = f
             const codeBlock = button.closest('.code-block');
             const code = codeBlock.querySelector('code').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                const originalText = button.textContent;
+                const originalText = button.innerHTML;
+                // Temporarily replace icon with text
                 button.textContent = 'Copied!';
                 button.style.backgroundColor = '#4CAF50';
                 button.style.color = 'white';
                 setTimeout(() => {
-                    button.textContent = originalText;
+                    button.innerHTML = originalText;
                     button.style.backgroundColor = '';
                     button.style.color = '';
                 }, 2000);
