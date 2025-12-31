@@ -1,4 +1,8 @@
 name: Dependency Update Test
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 on:
   pull_request:
