@@ -7,7 +7,9 @@ function copyFileSync(src, dest) {
 }
 
 function copyDir(srcDir, destDir, filterFn) {
-  if (!fs.existsSync(srcDir)) return;
+  if (!fs.existsSync(srcDir)) {
+    return;
+  }
   const entries = fs.readdirSync(srcDir, { withFileTypes: true });
   for (const entry of entries) {
     const srcPath = path.join(srcDir, entry.name);
@@ -33,8 +35,12 @@ try {
   const hljsDir = path.dirname(hljsPkg);
   // copy single theme
   const themeSrc = path.join(hljsDir, '..', 'styles', 'github-dark.min.css');
+  const lightThemeSrc = path.join(hljsDir, '..', 'styles', 'github.min.css');
   if (fs.existsSync(themeSrc)) {
     copyFileSync(themeSrc, path.join(out, 'highlight', 'styles', 'github-dark.min.css'));
+  }
+  if (fs.existsSync(lightThemeSrc)) {
+    copyFileSync(lightThemeSrc, path.join(out, 'highlight', 'styles', 'github.min.css'));
   }
   // try to find a minified bundle or fallback to lib/index.js
   const possibleMin = path.join(hljsDir, '..', 'build', 'highlight.min.js');

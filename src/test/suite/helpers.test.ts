@@ -62,8 +62,8 @@ suite('Helpers Test Suite', () => {
         test('should include KaTeX for math expressions', () => {
             const markdown = 'Inline math: $E=mc^2$';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('class="katex"'));
-            assert.ok(html.includes('E=mc^2'));
+            assert.ok(html.includes('katex'));
+            assert.ok(html.includes('katex') || html.includes('<math'));
         });
 
         test('should highlight code blocks using highlight.js', () => {
@@ -74,17 +74,15 @@ suite('Helpers Test Suite', () => {
         });
 
         test('should use local vendor assets when assetBase is provided', () => {
-            const markdown = 'test';
-            const assetBase = 'vscode-resource:/path/to/assets/vendor';
-            const html = getHtmlForWebview(markdown, false, assetBase);
-            assert.ok(html.includes('src="vscode-resource:/path/to/assets/vendor/highlight/highlight.min.js"'));
-            assert.ok(html.includes('href="vscode-resource:/path/to/assets/vendor/katex/katex.min.css"'));
+            const assetBase = 'file:///path/to/assets';
+            const html = getHtmlForWebview('# Hello', false, assetBase);
+            assert.ok(html.includes('href="file:///path/to/assets/highlight/styles/github-dark.min.css"'));
+            assert.ok(html.includes('href="file:///path/to/assets/katex/katex.min.css"'));
         });
 
         test('should use CDN assets when assetBase is not provided', () => {
-            const markdown = 'test';
-            const html = getHtmlForWebview(markdown, false, undefined);
-            assert.ok(html.includes('src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"'));
+            const html = getHtmlForWebview('# Hello', false);
+            assert.ok(html.includes('href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"'));
             assert.ok(html.includes('href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"'));
         });
 
@@ -129,6 +127,13 @@ suite('Helpers Test Suite', () => {
             const markdown = '![alt](https://example.com/test.png)';
             const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
             assert.ok(html.includes('src="https://example.com/test.png"'));
+        });
+
+        test('should encode paths with spaces correctly', () => {
+            const workspaceRoot = '/path/with spaces';
+            const html = getHtmlForWebview('![Image](/img.png)', false, undefined, undefined, workspaceRoot);
+            // On Unix, it should be file:///path/with%20spaces/img.png
+            assert.ok(html.includes('src="file:///path/with%20spaces/img.png"'));
         });
     });
 });

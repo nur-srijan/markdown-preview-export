@@ -1,11 +1,10 @@
 import * as process from 'process';
 import * as path from 'path';
-import { marked } from 'marked';
-import type { MarkedOptions } from 'marked';
+import { Marked } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 export function getChromeExecutableCandidates(): string[] {
     const candidates: Array<string> = [];
@@ -25,7 +24,6 @@ export function getChromeExecutableCandidates(): string[] {
             '/Applications/Chromium.app/Contents/MacOS/Chromium',
             '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
             '/Applications/Comet.app/Contents/MacOS/Comet',
-            '/Applications/Dia.app/Contents/MacOS/Dia'
         );
     } else if (platform === 'win32') {
         candidates.push(
@@ -42,15 +40,6 @@ export function getChromeExecutableCandidates(): string[] {
     return [...envPaths, ...candidates].filter((p, idx, arr) => arr.indexOf(p) === idx);
 }
 
-interface ExtendedMarkedOptions extends MarkedOptions {
-    highlight?: (code: string, lang: string) => string;
-    langPrefix?: string;
-    gfm?: boolean;
-    breaks?: boolean;
-    smartLists?: boolean;
-    smartypants?: boolean;
-    xhtml?: boolean;
-}
 
 export function getHtmlForWebview(
     markdownContent: string,
@@ -58,8 +47,10 @@ export function getHtmlForWebview(
     assetBase?: string,
     documentPath?: string,
     workspaceRoot?: string,
-    imageResolver?: (href: string) => string
+    imageResolver?: (href: string) => string,
+    cspSource?: string
 ): string {
+    const marked = new Marked();
     const renderer = new marked.Renderer();
 
     renderer.image = (href: string | null, title: string | null, text: string) => {
@@ -84,7 +75,9 @@ export function getHtmlForWebview(
             resolvedHref = imageResolver(resolvedHref);
         } else if (path.isAbsolute(resolvedHref) && !resolvedHref.startsWith('http')) {
             // Default to file:// for absolute paths if no resolver provided (mainly for exports)
-            resolvedHref = `file://${resolvedHref}`;
+            // Encode the path to handle spaces and special characters
+            const encodedPath = resolvedHref.split(path.sep).map(segment => encodeURIComponent(segment)).join('/');
+            resolvedHref = `file://${encodedPath.startsWith('/') ? '' : '/'}${encodedPath}`;
         }
 
         return `<img src="${resolvedHref}" alt="${text}" title="${title || ''}">`;
@@ -128,32 +121,56 @@ export function getHtmlForWebview(
         }
     };
 
-    const markedOptions: ExtendedMarkedOptions = {
+
+    // Use plugins instead of setOptions for better stability
+    marked.use(markedKatex({
+        throwOnError: false,
+        nonStandard: true,
+        output: 'html'
+    }));
+
+    marked.use({
         renderer,
-        highlight: function (code: string, lang: string) {
-            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-            return hljs.highlight(code, { language }).value;
-        },
-        langPrefix: 'hljs language-',
         gfm: true,
         breaks: false,
-        smartLists: true,
-        smartypants: false,
-        xhtml: false
-    };
+    });
 
-    marked.use(markedKatex());
-    marked.setOptions(markedOptions);
+    // Fix math block spacing: Ensure empty line before $$
+    // This fixes the issue where $$ block following text directly is treated as inline or ignored
+    let processedMarkdown = markdownContent.replace(/([^\n])\n(\$\$)/g, '$1\n\n$2');
 
-    let htmlContent = marked.parse(markdownContent) as string;
+    let htmlContent = marked.parse(processedMarkdown) as string;
 
     // Sanitize the HTML content
     // We need to allow specific tags and attributes for KaTeX and highlighting
-    htmlContent = DOMPurify.sanitize(htmlContent, {
-        USE_PROFILES: { html: true },
-        ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'svg', 'path', 'rect'],
-        ADD_ATTR: ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'd', 'x', 'y', 'width', 'height', 'rx', 'ry', 'id', 'class'],
-        ALLOW_UNKNOWN_PROTOCOLS: true,
+    // Sanitize the HTML content
+    // We need to allow specific tags and attributes for KaTeX and highlighting
+    htmlContent = sanitizeHtml(htmlContent, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+            'math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation',
+            'svg', 'path', 'rect', 'span', 'style', 'link', 'div', 'button', 'use', 'img'
+        ]),
+        allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            '*': ['style', 'class', 'id', 'title', 'aria-hidden', 'data-copy-text', 'onclick'],
+            'svg': ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'width', 'height', 'preserveAspectRatio'],
+            'path': ['d', 'fill', 'stroke'],
+            'rect': ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill'],
+            'img': ['src', 'alt', 'title'],
+            'a': ['href', 'title', 'target'],
+            'link': ['rel', 'href', 'type']
+        },
+        allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel', 'file', 'data', 'webview-uri', 'vscode-resource', 'vscode-webview-resource'],
+        allowedSchemesByTag: {
+            'img': ['http', 'https', 'file', 'data', 'webview-uri', 'vscode-resource', 'vscode-webview-resource'],
+            'link': ['http', 'https', 'file', 'webview-uri', 'vscode-resource', 'vscode-webview-resource']
+        },
+        allowProtocolRelative: false,
+        allowVulnerableTags: true, // Allow style tags for KaTeX
+        parser: {
+            lowerCaseTags: false,
+            lowerCaseAttributeNames: false
+        }
     });
 
     if (isForPdf) {
@@ -164,28 +181,25 @@ export function getHtmlForWebview(
         }) as string;
     }
 
-    const vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+    let vendor = assetBase ? assetBase.replace(/\/$/, '') : undefined;
+    if (vendor && vendor.startsWith('file://')) {
+        const urlPart = vendor.substring(7);
+        const encodedPath = urlPart.split('/').map(segment => encodeURIComponent(segment)).join('/');
+        vendor = `file://${encodedPath.startsWith('/') ? '' : '/'}${encodedPath}`;
+    }
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource || '*'} 'self' data: https: file:; script-src ${cspSource || '*'} 'unsafe-inline'; style-src ${cspSource || '*'} 'unsafe-inline' https: file:; font-src ${cspSource || '*'} https: file:;">
     <title>Markdown: Rich Preview</title>
-    <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
-    <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}">
-    <script src="${vendor ? vendor + '/highlight/highlight.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'}"></script>
+    <link rel="stylesheet" href="${vendor ? (isForPdf ? vendor + '/highlight/styles/github.min.css' : vendor + '/highlight/styles/github-dark.min.css') : (isForPdf ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css')}" onerror="console.error('Failed to load Highlight.js CSS:', this.href)">
+    <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}" onerror="console.error('Failed to load KaTeX CSS:', this.href)">
     <script>
-        // Initialize highlight.js
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('pre code').forEach((block) => {
-                // @ts-ignore - browser runtime
-                if (typeof hljs !== 'undefined' && hljs.highlightElement) {
-                    // @ts-ignore
-                    hljs.highlightElement(block);
-                }
-            });
-        });
+        // Highlighting is done on the extension side during markdown parsing.
+        // No browser-side initialization of highlight.js is needed.
 
         // Copy to clipboard function
         function copyToClipboard(button) {
@@ -214,6 +228,14 @@ export function getHtmlForWebview(
             }
             pre, .code-block, figure, table {
                 page-break-inside: avoid;
+            }
+            pre, code {
+                background-color: #f6f8fa !important;
+                color: #24292e !important;
+            }
+            .hljs {
+                background: #f6f8fa !important;
+                color: #24292e !important;
             }
             hr {
                 page-break-after: auto;
