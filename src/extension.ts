@@ -173,7 +173,7 @@ export function activate(context: vscode.ExtensionContext) {
         const markdownContent = editor.document.getText();
         // For exported HTML we can reference local files via file://
         const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
-        const htmlContent = getHtmlForWebview(markdownContent, false, assetBaseForExport);
+        const htmlContent = getHtmlForWebview(markdownContent, false, assetBaseForExport, 'file:');
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.html';
         const uri = await vscode.window.showSaveDialog({
@@ -209,7 +209,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Pass true for isForPdf to include PDF-specific styles
     // For PDF export we prefer absolute file URIs so Puppeteer can load local assets
     const assetBaseForExport = `file://${path.join(context.extensionPath, 'assets', 'vendor')}`;
-    const htmlContent = getHtmlForWebview(markdownContent, true, assetBaseForExport);
+    const htmlContent = getHtmlForWebview(markdownContent, true, assetBaseForExport, 'file:');
 
         const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.pdf';
         const uri = await vscode.window.showSaveDialog({
@@ -294,7 +294,7 @@ function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument
     }
 
     // Convert markdown to HTML, preferring bundled assets for the webview
-    const html = getHtmlForWebview(markdownContent, false, assetBase);
+    const html = getHtmlForWebview(markdownContent, false, assetBase, panel.webview.cspSource);
 
     // Update webview content
     panel.webview.html = html;
