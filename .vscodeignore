@@ -13,7 +13,10 @@ esbuild.js
 tsconfig.json
 package-lock.json
 example.md
-repro.js
+example_math.md
+repro**.js
+test**.js
+audit_sanitizer_defaults.js
 repro_output.html
 *.vsix
 *.log
@@ -22,4 +25,3 @@ repro_output.html
 *.html
 assets/
 !assets/vendor/
-/Users/nursrijan/.gemini/antigravity/brain/

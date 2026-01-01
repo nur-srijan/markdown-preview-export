@@ -267,8 +267,19 @@ export function activate(context: vscode.ExtensionContext) {
                             // Set a timeout for page operations
                             page.setDefaultNavigationTimeout(30000);
 
-                            // Use domcontentloaded for faster rendering since we're not waiting for network resources
-                            await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
+                            // Save HTML to a temporary file to allow local file access (needed for file:// images)
+                            const tempHtmlPath = path.join(os.tmpdir(), `markdown_export_${Date.now()}.html`);
+                            fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
+
+                            // Load the local file to establish file:// origin
+                            await page.goto(vscode.Uri.file(tempHtmlPath).toString(), { waitUntil: 'networkidle0' });
+
+                            // Clean up temp file
+                            try {
+                                fs.unlinkSync(tempHtmlPath);
+                            } catch (e) {
+                                console.warn('Failed to delete temp HTML file:', e);
+                            }
 
                             // Wait for any remaining resources to load (with a timeout)
                             try {

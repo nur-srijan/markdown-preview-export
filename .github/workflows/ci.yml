@@ -44,6 +44,9 @@ jobs:
     - name: Run linter
       run: npm run lint
 
+    - name: Test Sanitizer Defaults
+      run: npm run test:sanitizer
+
     - name: Install xvfb for headless testing
       run: sudo apt-get update && sudo apt-get install -y xvfb unzip
 
@@ -75,9 +78,9 @@ jobs:
       run: |
         echo "Testing Puppeteer compatibility..."
         node -e "
-        const puppeteer = require('puppeteer');
+        const puppeteer = require('puppeteer-core');
         (async () => {
-          console.log('Puppeteer version:', require('puppeteer/package.json').version);
+          console.log('Puppeteer version:', require('puppeteer-core/package.json').version);
           
           try {
             const browser = await puppeteer.launch({ 

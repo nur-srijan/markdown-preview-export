@@ -70,10 +70,10 @@ export function getHtmlForWebview(
             resolvedHref = path.resolve(documentDir, href);
         }
 
-        // Use custom resolver if provided
-        if (imageResolver) {
+        // Use custom resolver if provided, but ONLY for local resources
+        if (imageResolver && !resolvedHref.match(/^[a-z]+:\/\//i)) {
             resolvedHref = imageResolver(resolvedHref);
-        } else if (path.isAbsolute(resolvedHref) && !resolvedHref.startsWith('http')) {
+        } else if (path.isAbsolute(resolvedHref) && !resolvedHref.startsWith('http') && !imageResolver) {
             // Default to file:// for absolute paths if no resolver provided (mainly for exports)
             // Encode the path to handle spaces and special characters
             const encodedPath = resolvedHref.split(path.sep).map(segment => encodeURIComponent(segment)).join('/');
@@ -147,16 +147,32 @@ export function getHtmlForWebview(
     // We need to allow specific tags and attributes for KaTeX and highlighting
     htmlContent = sanitizeHtml(htmlContent, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-            'math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation',
-            'svg', 'path', 'rect', 'span', 'style', 'link', 'div', 'button', 'use', 'img'
+            'math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'sub', 'sup', 'annotation', 'mtable', 'mtr', 'mtd', 'none', 'mpadded', 'mphantom', 'maligngroup', 'malignmark',
+            'svg', 'path', 'rect', 'span', 'style', 'link', 'div', 'button', 'use', 'img',
+            'defs', 'linearGradient', 'radialGradient', 'stop', 'clipPath', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'g', 'symbol', 'marker', 'mask', 'pattern', 'foreignObject'
         ]),
         allowedAttributes: {
             ...sanitizeHtml.defaults.allowedAttributes,
             '*': ['style', 'class', 'id', 'title', 'aria-hidden', 'data-copy-text', 'onclick'],
-            'svg': ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'width', 'height', 'preserveAspectRatio'],
-            'path': ['d', 'fill', 'stroke'],
-            'rect': ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill'],
-            'img': ['src', 'alt', 'title'],
+            'svg': ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'width', 'height', 'preserveAspectRatio', 'version'],
+            'path': ['d', 'fill', 'stroke', 'stroke-width', 'transform'],
+            'rect': ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+            'circle': ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-width'],
+            'ellipse': ['cx', 'cy', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+            'line': ['x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width'],
+            'polyline': ['points', 'fill', 'stroke', 'stroke-width'],
+            'polygon': ['points', 'fill', 'stroke', 'stroke-width'],
+            'linearGradient': ['id', 'gradientUnits', 'x1', 'y1', 'x2', 'y2', 'gradientTransform', 'spreadMethod'],
+            'radialGradient': ['id', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy', 'gradientTransform', 'spreadMethod'],
+            'stop': ['offset', 'stop-color', 'stop-opacity'],
+            'use': ['href', 'x', 'y', 'width', 'height', 'fill'],
+            'text': ['x', 'y', 'dx', 'dy', 'text-anchor', 'fill', 'font-family', 'font-size', 'font-weight'],
+            'tspan': ['x', 'y', 'dx', 'dy', 'fill'],
+            'g': ['fill', 'stroke', 'stroke-width', 'transform', 'clip-path', 'mask', 'filter'],
+            'marker': ['id', 'markerWidth', 'markerHeight', 'refX', 'refY', 'orient', 'markerUnits'],
+            'mask': ['id', 'x', 'y', 'width', 'height', 'maskUnits', 'maskContentUnits'],
+            'pattern': ['id', 'x', 'y', 'width', 'height', 'patternUnits', 'patternContentUnits', 'preserveAspectRatio', 'viewBox', 'patternTransform'],
+            'img': ['src', 'alt', 'title', 'width', 'height'],
             'a': ['href', 'title', 'target'],
             'link': ['rel', 'href', 'type']
         },

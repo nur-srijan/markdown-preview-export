@@ -39,7 +39,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "node ./out/test/runTest.js",
-    "test:ci": "node ./scripts/run-tests-ci.js"
+    "test:ci": "node ./scripts/run-tests-ci.js",
+    "test:sanitizer": "node audit_sanitizer_defaults.js"
   },
   "dependencies": {
     "@types/sanitize-html": "^2.16.0",
