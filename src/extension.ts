@@ -112,6 +112,26 @@ async function launchPuppeteerWithFallbacks(): Promise<puppeteer.Browser> {
         errors.push(`executablePath() launch failed: ${error instanceof Error ? error.message : String(error)}`);
     }
 
+    // 6) Manual entry fallback
+    const manualPath = await vscode.window.showInputBox({
+        prompt: 'Puppeteer could not find a Chrome/Chromium executable. Please enter the absolute path to your Chrome/Chromium executable manually.',
+        placeHolder: 'e.g. /Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        ignoreFocusOut: true
+    });
+
+    if (manualPath) {
+        try {
+            return await puppeteer.launch({
+                executablePath: manualPath,
+                headless: true,
+                args: commonArgs,
+                userDataDir: path.join(os.tmpdir(), `puppeteer_user_data_manual_${Date.now()}`)
+            });
+        } catch (error) {
+            errors.push(`Manual path "${manualPath}" launch failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
     throw new Error(
         'Failed to launch Chrome/Chromium for PDF export. Attempts: \n' + errors.join('\n') +
         '\nPlease ensure Google Chrome or Chromium is installed and accessible.'

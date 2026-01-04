@@ -16,7 +16,9 @@ export function getChromeExecutableCandidates(): string[] {
             '/usr/bin/chromium',
             '/usr/bin/chromium-browser',
             '/snap/bin/chromium',
-            '/opt/google/chrome/chrome'
+            '/opt/google/chrome/chrome',
+            '/usr/bin/brave',
+            '/usr/bin/comet',
         );
     } else if (platform === 'darwin') {
         candidates.push(
@@ -29,7 +31,9 @@ export function getChromeExecutableCandidates(): string[] {
         candidates.push(
             'C:/Program Files/Google/Chrome/Application/chrome.exe',
             'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-            'C:/Program Files/Chromium/Application/chrome.exe'
+            'C:/Program Files/Chromium/Application/chrome.exe',
+            'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
+            'C:/Program Files/Comet/Comet.exe'
         );
     }
 
