@@ -41,7 +41,7 @@ Inline math: $E = mc^2$
 
 Block math:
 $$
-\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+\int_{-\infty}^\infty e^{-x^2} dx = \sqrt{\pi}
 $$
 
 ### 6. Tables
@@ -54,12 +54,26 @@ $$
 | Emoji        | ✅        | 😃    |
 
 ### 7. Images
-![VS Code Logo](https://code.visualstudio.com/assets/images/code-stable.png)
+![VS Code](https://code.visualstudio.com/assets/home/swimlane-anywhere.png)
 
+![Local Image](./assets/screenshot.png)
 ### 8. Blockquotes
 > "Markdown is not a replacement for HTML, or even close to it..."  
 > — John Gruber
 
+### 9. Admonitions
+
+> [!Tip]
+> This is a tip
+
+> [!Note]
+> This is a note
+
+> [!Warning]
+> This is a warning
+
+> [!Error]
+> This is an error
 ---
 
 ## 🎉 Try Exporting This File!
