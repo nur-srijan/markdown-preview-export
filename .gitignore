@@ -8,6 +8,7 @@ dist/
 *.js.map
 *.d.ts
 !src/marked-katex-extension.d.ts
+!src/marked-alert.d.ts
 !src/test/suite/glob.d.ts
 assets/vendor/
 

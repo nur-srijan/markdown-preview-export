@@ -63,17 +63,20 @@ $$
 
 ### 9. Admonitions
 
-> [!Tip]
-> This is a tip
+> [!NOTE]
+> Highlights information that users should take into account, even when skimming.
 
-> [!Note]
-> This is a note
+> [!TIP]
+> Optional information to help a user be more successful.
 
-> [!Warning]
-> This is a warning
+> [!IMPORTANT]
+> Crucial information necessary for users to succeed.
 
-> [!Error]
-> This is an error
+> [!WARNING]
+> Critical content demanding immediate user attention due to potential risks.
+
+> [!CAUTION]
+> Negative potential consequences of an action.
 ---
 
 ## 🎉 Try Exporting This File!

@@ -4,6 +4,7 @@ import { Marked } from 'marked';
 import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
+import markedAlert from 'marked-alert';
 import sanitizeHtml from 'sanitize-html';
 
 export function getChromeExecutableCandidates(): string[] {
@@ -17,15 +18,14 @@ export function getChromeExecutableCandidates(): string[] {
             '/usr/bin/chromium-browser',
             '/snap/bin/chromium',
             '/opt/google/chrome/chrome',
-            '/usr/bin/brave',
-            '/usr/bin/comet',
+            '/usr/bin/brave'
         );
     } else if (platform === 'darwin') {
         candidates.push(
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             '/Applications/Chromium.app/Contents/MacOS/Chromium',
             '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
-            '/Applications/Comet.app/Contents/MacOS/Comet',
+            '/Applications/Comet.app/Contents/MacOS/Comet'
         );
     } else if (platform === 'win32') {
         candidates.push(
@@ -133,6 +133,8 @@ export function getHtmlForWebview(
         output: 'html'
     }));
 
+    marked.use(markedAlert());
+
     marked.use({
         renderer,
         gfm: true,
@@ -158,6 +160,9 @@ export function getHtmlForWebview(
         allowedAttributes: {
             ...sanitizeHtml.defaults.allowedAttributes,
             '*': ['style', 'class', 'id', 'title', 'aria-hidden', 'data-copy-text', 'onclick'],
+            'div': ['class', 'id', 'style'],
+            'p': ['class', 'id', 'style'],
+            'span': ['class', 'id', 'style'],
             'svg': ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'width', 'height', 'preserveAspectRatio', 'version'],
             'path': ['d', 'fill', 'stroke', 'stroke-width', 'transform'],
             'rect': ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
@@ -395,6 +400,33 @@ export function getHtmlForWebview(
             max-width: 100%;
             box-sizing: content-box;
         }
+        /* GitHub-style Alerts */
+        .markdown-alert {
+            padding: 0.25rem 1rem;
+            margin-bottom: 1rem;
+            color: inherit;
+            border-left: 0.25em solid #dfe2e5;
+            border-radius: 6px;
+        }
+        .markdown-alert-title {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            line-height: 1;
+        }
+        .markdown-alert-title svg {
+            margin-right: 8px;
+        }
+        .markdown-alert-note { border-left-color: #0969da; }
+        .markdown-alert-note .markdown-alert-title { color: #0969da; }
+        .markdown-alert-tip { border-left-color: #1a7f37; }
+        .markdown-alert-tip .markdown-alert-title { color: #1a7f37; }
+        .markdown-alert-important { border-left-color: #8250df; }
+        .markdown-alert-important .markdown-alert-title { color: #8250df; }
+        .markdown-alert-warning { border-left-color: #9a6700; }
+        .markdown-alert-warning .markdown-alert-title { color: #9a6700; }
+        .markdown-alert-caution { border-left-color: #d1242f; }
+        .markdown-alert-caution .markdown-alert-title { color: #d1242f; }
     </style>
 </head>
 <body>

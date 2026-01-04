@@ -98,6 +98,16 @@ suite('Helpers Test Suite', () => {
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
         });
+
+        test('should parse GitHub-style alerts', () => {
+            const markdown = '> [!TIP]\n> This is a tip';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('class="markdown-alert markdown-alert-tip"'), 'Should have alert classes');
+            assert.ok(html.includes('class="markdown-alert-title"'), 'Should have alert title class');
+            assert.ok(html.includes('svg'), 'Should include SVG icon');
+            assert.ok(html.includes('Tip'), 'Should include alert title text');
+            assert.ok(html.includes('This is a tip'), 'Should include alert content');
+        });
     });
 
     suite('Image Path Resolution', () => {
