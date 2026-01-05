@@ -84,7 +84,7 @@ jobs:
           
           try {
             const browser = await puppeteer.launch({ 
-              channel: chrome,
+              channel: 'chrome',
               headless: true,
               args: ['--no-sandbox', '--disable-setuid-sandbox']
             });

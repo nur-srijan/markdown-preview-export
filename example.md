@@ -1,88 +1,96 @@
-# 🚀 Markdown Rich Preview & Export Demo
-
-Welcome to the **Markdown Rich Preview & Export** extension demo!
-
+---
+title: Enhanced Markdown Preview
+author: Antigravity
+tags: [gfm, preview, export]
 ---
 
-## ✨ Features Showcase
+# Enhanced Markdown Preview
 
-### 1. Headings & Text
-- **Bold**
-- *Italic*
-- ~~Strikethrough~~
-- [Link to VS Code](https://code.visualstudio.com)
+This file demonstrates the newly added GitHub Flavored Markdown (GFM) features.
 
-### 2. Emojis
-- 😃 😎 🚀 📝 ✅ ❌ 🔥 💡 🧠 🐍 🦄
-- Custom: :rocket: :sparkles: :tada: (if supported)
+## 1. Front Matter
+The YAML block at the top of this file is rendered as a clean table.
 
-### 3. Lists
-- Unordered list item 1
-- Unordered list item 2
-  - Nested item
-
-1. Ordered list item 1
-2. Ordered list item 2
-
-### 4. Code Blocks
-```python
-# Python code example
-def hello(name):
-    print(f"Hello, {name}! 👋")
-```
-
-```javascript
-// JavaScript code example
-console.log('Hello, world! 🌍');
-```
-
-### 5. Math (KaTeX)
-Inline math: $E = mc^2$
-
-Block math:
-$$
-\int_{-\infty}^\infty e^{-x^2} dx = \sqrt{\pi}
-$$
-
-### 6. Tables
-| Feature      | Supported | Emoji |
-|--------------|:---------:|:-----:|
-| **Bold**     | ✅        | 💪    |
-| *Italic*     | ✅        | ✨    |
-| `Code`       | ✅        | 💻    |
-| Math         | ✅        | ➗    |
-| Emoji        | ✅        | 😃    |
-
-### 7. Images
-![VS Code](https://code.visualstudio.com/assets/home/swimlane-anywhere.png)
-
-![Local Image](./assets/screenshot.png)
-### 8. Blockquotes
-> "Markdown is not a replacement for HTML, or even close to it..."  
-> — John Gruber
-
-### 9. Admonitions
-
+## 2. GitHub-Style Alerts
 > [!NOTE]
-> Highlights information that users should take into account, even when skimming.
+> This is a note alert.
 
 > [!TIP]
-> Optional information to help a user be more successful.
+> This is a tip alert with a small padding adjustment.
 
 > [!IMPORTANT]
-> Crucial information necessary for users to succeed.
+> This is an important alert.
 
 > [!WARNING]
-> Critical content demanding immediate user attention due to potential risks.
+> This is a warning alert.
 
 > [!CAUTION]
-> Negative potential consequences of an action.
+> This is a caution alert.
+
+## 3. Task Lists
+- [x] Support for GitHub alerts
+- [x] Support for footnotes
+- [x] Support for front matter
+- [ ] Support for Mermaid (Coming soon)
+
+## 4. Footnotes
+Here is a reference to a footnote[^1].
+And another one for more details[^2].
+
+## 5. Heading IDs
+You can link to this section using `#5-heading-ids` in the URL!
+
+## 6. Mathematical Expressions (KaTeX)
+The quadratic formula is:
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+## 7. Code Highlighting (Hljs)
+```typescript
+function hello() {
+    console.log("Hello, world 🌍!");
+}
+```
+
+```python
+function hello() {
+    console.log("Hello, world 👋!");
+}
+```
+
+```rust
+fn main() {
+    println!("Hello, world!");
+}
+```
+```diff
+- This line got removed
++ This line got added
+```
+
+### 8. Tables
+| Column 1 | Column 2 | Column 3 |
+| -------- | -------- | -------- |
+| Row 1    | Row 1    | Row 1    |
+| Row 2    | Row 2    | Row 2    |
+| Row 3    | Row 3    | Row 3    |
+
+### 9. Images
+![Markdown Logo](https://markdown-here.com/img/icon256.png)
+
+![Local Image](assets/screenshot.png)
+
+### 10. Basic Syntax
+
+- **Bold Text**
+- *Italic Text*
+- `Code Snippet`
+- [Link](https://code.visualstudio.com)
+- Emojis: 🌍 👋 👌 😎 🚀 🐍 ✅ ❌
+- Custom Emoji: :wave: :smile: :heart: :sparkles: :rocket: :snake: :white_check_mark: :x:
+
+## 11. Blockquotes
+> This is a blockquote.
+
 ---
-
-## 🎉 Try Exporting This File!
-- Export to **PDF** or **HTML** to see all features in action.
-- Emojis, math, code, and images should all render beautifully!
-
----
-
-Happy documenting! ✍️
+[^1]: This is the first footnote.
+[^2]: Footnotes are useful for detailed explanations without cluttering the main text.

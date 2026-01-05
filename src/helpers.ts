@@ -5,6 +5,9 @@ import hljs from 'highlight.js';
 import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
 import markedAlert from 'marked-alert';
+import markedFootnote from 'marked-footnote';
+import markedHookFrontmatter from 'marked-hook-frontmatter';
+import { gfmHeadingId } from 'marked-gfm-heading-id';
 import sanitizeHtml from 'sanitize-html';
 
 export function getChromeExecutableCandidates(): string[] {
@@ -57,7 +60,7 @@ export function getHtmlForWebview(
     const marked = new Marked();
     const renderer = new marked.Renderer();
 
-    renderer.image = (href: string | null, title: string | null, text: string) => {
+    renderer.image = ({ href, title, text }: { href: string | null, title: string | null, text: string }) => {
         if (!href) {
             return `<img src="" alt="${text}" title="${title || ''}">`;
         }
@@ -87,7 +90,7 @@ export function getHtmlForWebview(
         return `<img src="${resolvedHref}" alt="${text}" title="${title || ''}">`;
     };
 
-    renderer.code = (code: string, language: string | undefined) => {
+    renderer.code = ({ text: code, lang: language }: { text: string, lang?: string }) => {
         const lang = language || 'plaintext';
         try {
             const validLanguage = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -134,6 +137,18 @@ export function getHtmlForWebview(
     }));
 
     marked.use(markedAlert());
+    marked.use(markedFootnote());
+    marked.use(gfmHeadingId());
+    let frontMatterTable = '';
+    marked.use(markedHookFrontmatter((data: any) => {
+        if (data && Object.keys(data).length > 0) {
+            frontMatterTable = '<div class="front-matter"><div class="front-matter-title">Front Matter</div><table>';
+            for (const [key, value] of Object.entries(data)) {
+                frontMatterTable += `<tr><td><strong>${key}</strong></td><td>${value}</td></tr>`;
+            }
+            frontMatterTable += '</table></div>';
+        }
+    }));
 
     marked.use({
         renderer,
@@ -146,6 +161,10 @@ export function getHtmlForWebview(
     let processedMarkdown = markdownContent.replace(/([^\n])\n(\$\$)/g, '$1\n\n$2');
 
     let htmlContent = marked.parse(processedMarkdown) as string;
+
+    if (frontMatterTable) {
+        htmlContent = frontMatterTable + htmlContent;
+    }
 
     // Sanitize the HTML content
     // We need to allow specific tags and attributes for KaTeX and highlighting
@@ -163,6 +182,11 @@ export function getHtmlForWebview(
             'div': ['class', 'id', 'style'],
             'p': ['class', 'id', 'style'],
             'span': ['class', 'id', 'style'],
+            'li': ['class', 'id', 'style'],
+            'input': ['type', 'checked', 'disabled', 'class'],
+            'section': ['class', 'id'],
+            'ol': ['start', 'class', 'id'],
+            'sup': ['id', 'class'],
             'svg': ['xmlns', 'viewBox', 'fill', 'stroke', 'stroke-width', 'width', 'height', 'preserveAspectRatio', 'version'],
             'path': ['d', 'fill', 'stroke', 'stroke-width', 'transform'],
             'rect': ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
@@ -427,6 +451,64 @@ export function getHtmlForWebview(
         .markdown-alert-warning .markdown-alert-title { color: #9a6700; }
         .markdown-alert-caution { border-left-color: #d1242f; }
         .markdown-alert-caution .markdown-alert-title { color: #d1242f; }
+
+        /* Footnotes */
+        .footnotes {
+            font-size: 12px;
+            color: #6a737d;
+            border-top: 1px solid #dfe2e5;
+            margin-top: 24px;
+        }
+        .footnotes ol {
+            padding-left: 16px;
+        }
+        .footnote-backref {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin-left: 4px;
+        }
+
+        /* Task Lists */
+        ul.contains-task-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .task-list-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+        .task-list-item input[type="checkbox"] {
+            margin: 0.25em 0.5em 0 0;
+            vertical-align: middle;
+        }
+
+        /* Front Matter */
+        .front-matter {
+            margin-bottom: 24px;
+            border: 1px solid #dfe2e5;
+            border-radius: 6px;
+            padding: 12px;
+            background-color: #f6f8fa;
+        }
+        .front-matter table {
+            margin-bottom: 0;
+            border: none;
+        }
+        .front-matter table tr {
+            background-color: transparent;
+            border: none;
+        }
+        .front-matter table td {
+            border: none;
+            padding: 4px 8px;
+        }
+        .front-matter-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6a737d;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>

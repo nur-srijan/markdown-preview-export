@@ -55,7 +55,8 @@ suite('Helpers Test Suite', () => {
         test('should convert basic Markdown to HTML', () => {
             const markdown = '# Hello\n\nThis is **bold** text.';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('<h1>Hello</h1>'));
+            assert.ok(html.includes('id="hello"'), 'Should have heading ID');
+            assert.ok(html.includes('Hello'), 'Should include heading text');
             assert.ok(html.includes('<strong>bold</strong>'));
         });
 
@@ -107,6 +108,28 @@ suite('Helpers Test Suite', () => {
             assert.ok(html.includes('svg'), 'Should include SVG icon');
             assert.ok(html.includes('Tip'), 'Should include alert title text');
             assert.ok(html.includes('This is a tip'), 'Should include alert content');
+        });
+
+        test('should parse footnotes', () => {
+            const markdown = 'Text with footnote[^1]\n\n[^1]: Footnote content';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('<sup'), 'Should have sup tag for reference');
+            assert.ok(html.includes('class="footnotes"'), 'Should have footnotes section');
+            assert.ok(html.includes('Footnote content'), 'Should include footnote text');
+        });
+
+        test('should parse front matter', () => {
+            const markdown = '---\ntitle: Hello\nauthor: Me\n---\n# Content';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('title'), 'Should include front matter key');
+            assert.ok(html.includes('Hello'), 'Should include front matter value');
+            assert.ok(html.includes('id="content"'), 'Should include content heading ID');
+        });
+
+        test('should generate heading IDs', () => {
+            const markdown = '# My Heading';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('id="my-heading"'), 'Should have heading ID');
         });
     });
 
