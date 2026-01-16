@@ -280,6 +280,8 @@ export function activate(context: vscode.ExtensionContext) {
                         title: 'Generating PDF...',
                         cancellable: false
                     }, async () => {
+                        let tempHtmlPath: string | undefined;
+
                         try {
                             const browser = await getBrowserInstance();
                             page = await browser.newPage();
@@ -288,18 +290,11 @@ export function activate(context: vscode.ExtensionContext) {
                             page.setDefaultNavigationTimeout(30000);
 
                             // Save HTML to a temporary file to allow local file access (needed for file:// images)
-                            const tempHtmlPath = path.join(os.tmpdir(), `markdown_export_${Date.now()}.html`);
+                            tempHtmlPath = path.join(os.tmpdir(), `markdown_export_${Date.now()}.html`);
                             fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
 
                             // Load the local file to establish file:// origin
                             await page.goto(vscode.Uri.file(tempHtmlPath).toString(), { waitUntil: 'networkidle0' });
-
-                            // Clean up temp file
-                            try {
-                                fs.unlinkSync(tempHtmlPath);
-                            } catch (e) {
-                                console.warn('Failed to delete temp HTML file:', e);
-                            }
 
                             // Wait for any remaining resources to load (with a timeout)
                             try {
@@ -327,6 +322,17 @@ export function activate(context: vscode.ExtensionContext) {
                             console.error('PDF Export Error:', error);
                             throw error; // Re-throw to ensure the progress indicator shows the error
                         } finally {
+                            // Clean up temp file
+                            if (tempHtmlPath) {
+                                try {
+                                    if (fs.existsSync(tempHtmlPath)) {
+                                        fs.unlinkSync(tempHtmlPath);
+                                    }
+                                } catch (e) {
+                                    console.warn('Failed to delete temp HTML file:', e);
+                                }
+                            }
+
                             if (page && !page.isClosed()) {
                                 await page.close().catch(console.error);
                             }

@@ -53,7 +53,7 @@ function hello() {
 
 ```python
 function hello() {
-    console.log("Hello, world 👋!");
+    print("Hello, world 👋!");
 }
 ```
 
@@ -75,7 +75,7 @@ fn main() {
 | Row 3    | Row 3    | Row 3    |
 
 ### 9. Images
-![Markdown Logo](https://markdown-here.com/img/icon256.png)
+![VS Code](https://code.visualstudio.com/assets/home/swimlane-customized.png)
 
 ![Local Image](assets/screenshot.png)
 
