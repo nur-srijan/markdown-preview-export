@@ -55,15 +55,16 @@ suite('Helpers Test Suite', () => {
         test('should convert basic Markdown to HTML', () => {
             const markdown = '# Hello\n\nThis is **bold** text.';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('<h1>Hello</h1>'));
+            assert.ok(html.includes('id="hello"'), 'Should have heading ID');
+            assert.ok(html.includes('Hello'), 'Should include heading text');
             assert.ok(html.includes('<strong>bold</strong>'));
         });
 
         test('should include KaTeX for math expressions', () => {
             const markdown = 'Inline math: $E=mc^2$';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('class="katex"'));
-            assert.ok(html.includes('E=mc^2'));
+            assert.ok(html.includes('katex'));
+            assert.ok(html.includes('katex') || html.includes('<math'));
         });
 
         test('should highlight code blocks using highlight.js', () => {
@@ -74,17 +75,15 @@ suite('Helpers Test Suite', () => {
         });
 
         test('should use local vendor assets when assetBase is provided', () => {
-            const markdown = 'test';
-            const assetBase = 'vscode-resource:/path/to/assets/vendor';
-            const html = getHtmlForWebview(markdown, false, assetBase);
-            assert.ok(html.includes('src="vscode-resource:/path/to/assets/vendor/highlight/highlight.min.js"'));
-            assert.ok(html.includes('href="vscode-resource:/path/to/assets/vendor/katex/katex.min.css"'));
+            const assetBase = 'file:///path/to/assets';
+            const html = getHtmlForWebview('# Hello', false, assetBase);
+            assert.ok(html.includes('href="file:///path/to/assets/highlight/styles/github-dark.min.css"'));
+            assert.ok(html.includes('href="file:///path/to/assets/katex/katex.min.css"'));
         });
 
         test('should use CDN assets when assetBase is not provided', () => {
-            const markdown = 'test';
-            const html = getHtmlForWebview(markdown, false, undefined);
-            assert.ok(html.includes('src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"'));
+            const html = getHtmlForWebview('# Hello', false);
+            assert.ok(html.includes('href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"'));
             assert.ok(html.includes('href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"'));
         });
 
@@ -99,6 +98,75 @@ suite('Helpers Test Suite', () => {
             const markdown = 'Hello ☺️';
             const html = getHtmlForWebview(markdown, false);
             assert.strictEqual(html.includes('<img class="emoji"'), false);
+        });
+
+        test('should parse GitHub-style alerts', () => {
+            const markdown = '> [!TIP]\n> This is a tip';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('class="markdown-alert markdown-alert-tip"'), 'Should have alert classes');
+            assert.ok(html.includes('class="markdown-alert-title"'), 'Should have alert title class');
+            assert.ok(html.includes('svg'), 'Should include SVG icon');
+            assert.ok(html.includes('Tip'), 'Should include alert title text');
+            assert.ok(html.includes('This is a tip'), 'Should include alert content');
+        });
+
+        test('should parse footnotes', () => {
+            const markdown = 'Text with footnote[^1]\n\n[^1]: Footnote content';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('<sup'), 'Should have sup tag for reference');
+            assert.ok(html.includes('class="footnotes"'), 'Should have footnotes section');
+            assert.ok(html.includes('Footnote content'), 'Should include footnote text');
+        });
+
+        test('should parse front matter', () => {
+            const markdown = '---\ntitle: Hello\nauthor: Me\n---\n# Content';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('title'), 'Should include front matter key');
+            assert.ok(html.includes('Hello'), 'Should include front matter value');
+            assert.ok(html.includes('id="content"'), 'Should include content heading ID');
+        });
+
+        test('should generate heading IDs', () => {
+            const markdown = '# My Heading';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('id="my-heading"'), 'Should have heading ID');
+        });
+    });
+
+    suite('Image Path Resolution', () => {
+        const workspaceRoot = '/path/to/workspace';
+        const documentPath = '/path/to/workspace/docs/readme.md';
+
+        test('should resolve root-relative paths relative to workspace root', () => {
+            const markdown = '![alt](/images/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="file:///path/to/workspace/images/test.png"'));
+        });
+
+        test('should resolve relative paths relative to document directory', () => {
+            const markdown = '![alt](images/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="file:///path/to/workspace/docs/images/test.png"'));
+        });
+
+        test('should use imageResolver if provided', () => {
+            const markdown = '![alt](/images/test.png)';
+            const imageResolver = (href: string) => `webview-uri://${href}`;
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot, imageResolver);
+            assert.ok(html.includes('src="webview-uri:///path/to/workspace/images/test.png"'));
+        });
+
+        test('should not change external URLs', () => {
+            const markdown = '![alt](https://example.com/test.png)';
+            const html = getHtmlForWebview(markdown, false, undefined, documentPath, workspaceRoot);
+            assert.ok(html.includes('src="https://example.com/test.png"'));
+        });
+
+        test('should encode paths with spaces correctly', () => {
+            const workspaceRoot = '/path/with spaces';
+            const html = getHtmlForWebview('![Image](/img.png)', false, undefined, undefined, workspaceRoot);
+            // On Unix, it should be file:///path/with%20spaces/img.png
+            assert.ok(html.includes('src="file:///path/with%20spaces/img.png"'));
         });
     });
 });

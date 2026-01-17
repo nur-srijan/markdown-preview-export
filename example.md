@@ -1,71 +1,96 @@
-# 🚀 Markdown Rich Preview & Export Demo
-
-Welcome to the **Markdown Rich Preview & Export** extension demo!
-
+---
+title: Enhanced Markdown Preview
+author: Antigravity
+tags: [gfm, preview, export]
 ---
 
-## ✨ Features Showcase
+# Enhanced Markdown Preview
 
-### 1. Headings & Text
-- **Bold**
-- *Italic*
-- ~~Strikethrough~~
-- [Link to VS Code](https://code.visualstudio.com)
+This file demonstrates the newly added GitHub Flavored Markdown (GFM) features.
 
-### 2. Emojis
-- 😃 😎 🚀 📝 ✅ ❌ 🔥 💡 🧠 🐍 🦄
-- Custom: :rocket: :sparkles: :tada: (if supported)
+## 1. Front Matter
+The YAML block at the top of this file is rendered as a clean table.
 
-### 3. Lists
-- Unordered list item 1
-- Unordered list item 2
-  - Nested item
+## 2. GitHub-Style Alerts
+> [!NOTE]
+> This is a note alert.
 
-1. Ordered list item 1
-2. Ordered list item 2
+> [!TIP]
+> This is a tip alert with a small padding adjustment.
 
-### 4. Code Blocks
+> [!IMPORTANT]
+> This is an important alert.
+
+> [!WARNING]
+> This is a warning alert.
+
+> [!CAUTION]
+> This is a caution alert.
+
+## 3. Task Lists
+- [x] Support for GitHub alerts
+- [x] Support for footnotes
+- [x] Support for front matter
+- [ ] Support for Mermaid (Coming soon)
+
+## 4. Footnotes
+Here is a reference to a footnote[^1].
+And another one for more details[^2].
+
+## 5. Heading IDs
+You can link to this section using `#5-heading-ids` in the URL!
+
+## 6. Mathematical Expressions (KaTeX)
+The quadratic formula is:
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+## 7. Code Highlighting (Hljs)
+```typescript
+function hello() {
+    console.log("Hello, world 🌍!");
+}
+```
+
 ```python
-# Python code example
-def hello(name):
-    print(f"Hello, {name}! 👋")
+function hello() {
+    print("Hello, world 👋!");
+}
 ```
 
-```javascript
-// JavaScript code example
-console.log('Hello, world! 🌍');
+```rust
+fn main() {
+    println!("Hello, world!");
+}
+```
+```diff
+- This line got removed
++ This line got added
 ```
 
-### 5. Math (KaTeX)
-Inline math: $E = mc^2$
+### 8. Tables
+| Column 1 | Column 2 | Column 3 |
+| -------- | -------- | -------- |
+| Row 1    | Row 1    | Row 1    |
+| Row 2    | Row 2    | Row 2    |
+| Row 3    | Row 3    | Row 3    |
 
-Block math:
-$$
-\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
-$$
+### 9. Images
+![VS Code](https://code.visualstudio.com/assets/home/swimlane-customized.png)
 
-### 6. Tables
-| Feature      | Supported | Emoji |
-|--------------|:---------:|:-----:|
-| **Bold**     | ✅        | 💪    |
-| *Italic*     | ✅        | ✨    |
-| `Code`       | ✅        | 💻    |
-| Math         | ✅        | ➗    |
-| Emoji        | ✅        | 😃    |
+![Local Image](assets/screenshot.png)
 
-### 7. Images
-![VS Code Logo](https://code.visualstudio.com/assets/images/code-stable.png)
+### 10. Basic Syntax
 
-### 8. Blockquotes
-> "Markdown is not a replacement for HTML, or even close to it..."  
-> — John Gruber
+- **Bold Text**
+- *Italic Text*
+- `Code Snippet`
+- [Link](https://code.visualstudio.com)
+- Emojis: 🌍 👋 👌 😎 🚀 🐍 ✅ ❌
+- Custom Emoji: :wave: :smile: :heart: :sparkles: :rocket: :snake: :white_check_mark: :x:
 
----
-
-## 🎉 Try Exporting This File!
-- Export to **PDF** or **HTML** to see all features in action.
-- Emojis, math, code, and images should all render beautifully!
+## 11. Blockquotes
+> This is a blockquote.
 
 ---
-
-Happy documenting! ✍️
+[^1]: This is the first footnote.
+[^2]: Footnotes are useful for detailed explanations without cluttering the main text.

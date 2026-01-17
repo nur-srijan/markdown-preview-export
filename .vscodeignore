@@ -1,29 +1,27 @@
-# Build output
-dist/
-
-# Development files
-.vscode/
-.vscode-test/
+out/test/
+out/**/*.map
 node_modules/
 src/
 test/
-
-# Config files
-esbuild.js
-tsconfig.json
+.vscode/
+.vscode-test/
+.github/
+.gitignore
 .eslintrc.json
 .eslintignore
-*.config.*
-
-# Other
-assets/
-!assets/vendor/
-.gitignore
-.github/
+esbuild.js
+tsconfig.json
+package-lock.json
+example.md
+example_math.md
+repro**.js
+test**.js
+audit_sanitizer_defaults.js
+repro_output.html
 *.vsix
 *.log
 *.tsbuildinfo
-*.map
-example.md
 *.pdf
 *.html
+assets/
+!assets/vendor/
