@@ -3,6 +3,7 @@ out/**/*.map
 node_modules/
 src/
 test/
+scripts/
 .vscode/
 .vscode-test/
 .github/
