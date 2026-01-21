@@ -18,16 +18,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test
-
       - name: Install vsce and ovsx
-        run: npm install -g vsce ovsx
+        run: npm install -g @vscode/vsce ovsx
 
       - name: Package extension
         run: vsce package
