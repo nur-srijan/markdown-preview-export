@@ -36,4 +36,4 @@ jobs:
         run: vsce publish --packagePath *.vsix --pat ${{ secrets.VSCE_TOKEN }}
 
       - name: Publish to Open VSX
-        run: ovsx publish --packagePath *.vsix --pat ${{ secrets.OPEN_VSX_TOKEN }}
+        run: ovsx publish --packagePath *.vsix --pat ${{ secrets.OVSX_TOKEN }}
