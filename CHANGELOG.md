@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.0) - 2026-01-21
+### 🚀 New Features
+
+- **Advanced GFM Support**: Added support for Footnotes, Task Lists, and automatically generated Heading IDs for easier section linking.
+- **Front Matter Rendering**: YAML front matter is now correctly parsed and rendered as a clean, GitHub-style table at the top of the preview.
+- **Theme Awareness**: Tables and front matter now dynamically adapt to VS Code's light and dark themes using native CSS variables.
+- **Enhanced Security**: Implemented robust HTML sanitization to ensure safe rendering of untrusted markdown content.
+- **Community Documentation**: Added `SECURITY.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` to foster a better open-source environment.
+
+### 🐛 Bug Fixes
+
+- **Local Image Loading**: Fixed `401 Unauthorized` errors when loading local relative images (e.g., `assets/image.png`) in the webview by correctly configuring `localResourceRoots`.
+- **Renderer Compatibility**: Updated extension to work seamlessly with `marked` v15 renderer API changes.
+
 ## [1.1.2](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.1.2) - 2025-09-03
 ### 🐛 Bug Fixes
 
@@ -60,10 +74,8 @@ All notable changes to this project will be documented in this file.
 ## [Planned]
 ### 🚧 Coming Soon
 
-- 🔄️ Dynamic theme support for the code blocks, tables and other elements based on the VS Code theme.
 - 🧜‍♀️ Support for **Mermaid diagrams** and **PlantUML**.
 - 🎨 Support for custom themes.
-- 🛡️ Fixing possible security vulnerabilities.
 - ⚡ Fixing possible performance issues, memory leaks and other bugs.
 - 🚀 Support for JetBrains, Vim, Sublime Text (as standalone tools or plugins).
 - 🤖 AI-powered README and Changelog generation based on workspace analysis.

@@ -6,8 +6,8 @@ import twemoji from 'twemoji';
 import markedKatex from 'marked-katex-extension';
 import markedAlert from 'marked-alert';
 import markedFootnote from 'marked-footnote';
-import markedHookFrontmatter from 'marked-hook-frontmatter';
 import { gfmHeadingId } from 'marked-gfm-heading-id';
+import * as yaml from 'js-yaml';
 import sanitizeHtml from 'sanitize-html';
 
 export function getChromeExecutableCandidates(): string[] {
@@ -139,16 +139,6 @@ export function getHtmlForWebview(
     marked.use(markedAlert());
     marked.use(markedFootnote());
     marked.use(gfmHeadingId());
-    let frontMatterTable = '';
-    marked.use(markedHookFrontmatter((data: any) => {
-        if (data && Object.keys(data).length > 0) {
-            frontMatterTable = '<div class="front-matter"><div class="front-matter-title">Front Matter</div><table>';
-            for (const [key, value] of Object.entries(data)) {
-                frontMatterTable += `<tr><td><strong>${key}</strong></td><td>${value}</td></tr>`;
-            }
-            frontMatterTable += '</table></div>';
-        }
-    }));
 
     marked.use({
         renderer,
@@ -156,9 +146,38 @@ export function getHtmlForWebview(
         breaks: false,
     });
 
+    // Extract and parse front matter
+    let frontMatterTable = '';
+    let processedMarkdown = markdownContent;
+
+    const frontMatterRegex = /^---\n([\s\S]*?)\n---\n/;
+    const match = markdownContent.match(frontMatterRegex);
+
+    if (match) {
+        try {
+            const frontMatterYaml = match[1];
+            const frontMatterData = yaml.load(frontMatterYaml) as Record<string, any>;
+
+            if (frontMatterData && Object.keys(frontMatterData).length > 0) {
+                frontMatterTable = '<div class="front-matter"><div class="front-matter-title">Front Matter</div><table>';
+                for (const [key, value] of Object.entries(frontMatterData)) {
+                    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
+                    frontMatterTable += `<tr><td><strong>${key}</strong></td><td>${displayValue}</td></tr>`;
+                }
+                frontMatterTable += '</table></div>';
+            }
+
+            // Remove front matter from markdown
+            processedMarkdown = markdownContent.replace(frontMatterRegex, '');
+        } catch (e) {
+            // If YAML parsing fails, leave the content as-is
+            console.warn('Failed to parse front matter:', e);
+        }
+    }
+
     // Fix math block spacing: Ensure empty line before $$
     // This fixes the issue where $$ block following text directly is treated as inline or ignored
-    let processedMarkdown = markdownContent.replace(/([^\n])\n(\$\$)/g, '$1\n\n$2');
+    processedMarkdown = processedMarkdown.replace(/([^\n])\n(\$\$)/g, '$1\n\n$2');
 
     let htmlContent = marked.parse(processedMarkdown) as string;
 
@@ -411,14 +430,14 @@ export function getHtmlForWebview(
         }
         table th, table td {
             padding: 6px 13px;
-            border: 1px solid #dfe2e5;
+            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
         }
         table tr {
-            background-color: #fff;
-            border-top: 1px solid #c6cbd1;
+            background-color: var(--vscode-editor-background, #fff);
+            border-top: 1px solid var(--vscode-editorGroup-border, #c6cbd1);
         }
         table tr:nth-child(2n) {
-            background-color: #f6f8fa;
+            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
         }
         img {
             max-width: 100%;
@@ -485,10 +504,10 @@ export function getHtmlForWebview(
         /* Front Matter */
         .front-matter {
             margin-bottom: 24px;
-            border: 1px solid #dfe2e5;
+            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
             border-radius: 6px;
             padding: 12px;
-            background-color: #f6f8fa;
+            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
         }
         .front-matter table {
             margin-bottom: 0;
@@ -506,7 +525,7 @@ export function getHtmlForWebview(
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 12px;
-            color: #6a737d;
+            color: var(--vscode-descriptionForeground, #6a737d);
             text-transform: uppercase;
         }
     </style>

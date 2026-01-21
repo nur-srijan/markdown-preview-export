@@ -187,6 +187,7 @@ export function activate(context: vscode.ExtensionContext) {
                         vscode.Uri.file(path.join(context.extensionPath, 'media')),
                         vscode.Uri.file(path.join(context.extensionPath, 'assets')),
                         vscode.Uri.file(context.extensionPath), // Allow entire extension folder just in case
+                        vscode.Uri.file(path.dirname(editor.document.fileName)), // Allow document's directory for relative images
                         ...(vscode.workspace.workspaceFolders?.map(folder => folder.uri) || [])
                     ]
                 }
