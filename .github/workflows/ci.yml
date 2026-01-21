@@ -5,9 +5,15 @@ permissions:
 on:
   push:
     branches: [ main, master ]
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
   pull_request:
     branches: [ main, master ]
-  # Run tests when dependencies are updated
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+
   schedule:
     - cron: '0 2 * * 1' # Weekly on Monday at 2 AM UTC
 

@@ -430,14 +430,14 @@ export function getHtmlForWebview(
         }
         table th, table td {
             padding: 6px 13px;
-            border: 1px solid #dfe2e5;
+            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
         }
         table tr {
-            background-color: #fff;
-            border-top: 1px solid #c6cbd1;
+            background-color: var(--vscode-editor-background, #fff);
+            border-top: 1px solid var(--vscode-editorGroup-border, #c6cbd1);
         }
         table tr:nth-child(2n) {
-            background-color: #f6f8fa;
+            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
         }
         img {
             max-width: 100%;
@@ -504,10 +504,10 @@ export function getHtmlForWebview(
         /* Front Matter */
         .front-matter {
             margin-bottom: 24px;
-            border: 1px solid #dfe2e5;
+            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
             border-radius: 6px;
             padding: 12px;
-            background-color: #f6f8fa;
+            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
         }
         .front-matter table {
             margin-bottom: 0;
@@ -525,7 +525,7 @@ export function getHtmlForWebview(
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 12px;
-            color: #6a737d;
+            color: var(--vscode-descriptionForeground, #6a737d);
             text-transform: uppercase;
         }
     </style>
