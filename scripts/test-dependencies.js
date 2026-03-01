@@ -25,7 +25,7 @@ async function testPuppeteerCompatibility() {
     // Test browser launch with extension's exact configuration
     browser = await puppeteer.launch({ 
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: []
     });
     console.log('✓ Browser launched successfully');
     

@@ -92,7 +92,7 @@ jobs:
             const browser = await puppeteer.launch({ 
               channel: 'chrome',
               headless: true,
-              args: ['--no-sandbox', '--disable-setuid-sandbox']
+              args: []
             });
             console.log('✓ Browser launched successfully');
             console.log('Browser version:', await browser.version());

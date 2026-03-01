@@ -28,7 +28,11 @@ export function getChromeExecutableCandidates(): string[] {
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             '/Applications/Chromium.app/Contents/MacOS/Chromium',
             '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
-            '/Applications/Comet.app/Contents/MacOS/Comet'
+            '/Applications/Comet.app/Contents/MacOS/Comet',
+            '~/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '~/Applications/Chromium.app/Contents/MacOS/Chromium',
+            '~/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+            '~/Applications/Comet.app/Contents/MacOS/Comet'
         );
     } else if (platform === 'win32') {
         candidates.push(
@@ -36,7 +40,11 @@ export function getChromeExecutableCandidates(): string[] {
             'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
             'C:/Program Files/Chromium/Application/chrome.exe',
             'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
-            'C:/Program Files/Comet/Comet.exe'
+            'C:/Program Files/Comet/Comet.exe',
+            '%LOCALAPPDATA%/Google/Chrome/Application/chrome.exe',
+            '%LOCALAPPDATA%/Programs/Chromium/Application/chrome.exe',
+            '%LOCALAPPDATA%/Programs/BraveSoftware/Brave-Browser/Application/brave.exe',
+
         );
     }
 
@@ -45,6 +53,28 @@ export function getChromeExecutableCandidates(): string[] {
         process.env.CHROME_PATH
     ].filter((p): p is string => !!p && p.length > 0);
     return [...envPaths, ...candidates].filter((p, idx, arr) => arr.indexOf(p) === idx);
+}
+
+interface FrontMatterMetadata {
+    title?: string;
+    author?: string;
+    description?: string;
+    [key: string]: any;
+}
+
+export function extractFrontMatter(markdownContent: string): FrontMatterMetadata {
+    const frontMatterRegex = /^---\n([\s\S]*?)\n---\n/;
+    const match = markdownContent.match(frontMatterRegex);
+
+    if (match) {
+        try {
+            const frontMatterYaml = match[1];
+            return yaml.load(frontMatterYaml) as FrontMatterMetadata;
+        } catch (e) {
+            console.warn('Failed to parse front matter:', e);
+        }
+    }
+    return {};
 }
 
 
@@ -185,8 +215,6 @@ export function getHtmlForWebview(
         htmlContent = frontMatterTable + htmlContent;
     }
 
-    // Sanitize the HTML content
-    // We need to allow specific tags and attributes for KaTeX and highlighting
     // Sanitize the HTML content
     // We need to allow specific tags and attributes for KaTeX and highlighting
     htmlContent = sanitizeHtml(htmlContent, {
@@ -439,10 +467,9 @@ export function getHtmlForWebview(
         table tr:nth-child(2n) {
             background-color: var(--vscode-list-hoverBackground, #f6f8fa);
         }
-        img {
-            max-width: 100%;
-            box-sizing: content-box;
-        }
+        img { display: block; max-width: fit-content; height: auto; margin-left: auto; margin-right: auto;
+        max-width: 100%; box-sizing: content-box; }
+
         /* GitHub-style Alerts */
         .markdown-alert {
             padding: 0.25rem 1rem;

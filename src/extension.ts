@@ -3,8 +3,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as puppeteer from 'puppeteer-core';
+import epubGen from 'epub-gen-memory';
+// Polyfill AbortController for VS Code extension host environment
+import 'abort-controller/polyfill';
 // marked-katex and twemoji are used in helpers
-import { getChromeExecutableCandidates, getHtmlForWebview } from './helpers';
+import { getChromeExecutableCandidates, getHtmlForWebview, extractFrontMatter } from './helpers';
 
 // Fix for missing types for marked-katex-extension
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
@@ -33,8 +36,6 @@ async function getBrowserInstance(): Promise<puppeteer.Browser> {
 // Try launching Puppeteer with multiple strategies to avoid version pinning issues
 async function launchPuppeteerWithFallbacks(): Promise<puppeteer.Browser> {
     const commonArgs = [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
         '--no-zygote',
@@ -346,7 +347,133 @@ export function activate(context: vscode.ExtensionContext) {
             }
         });
 
+
         context.subscriptions.push(exportToPdfCommand);
+
+        // Register the export to EPUB command
+        const exportToEpubCommand = vscode.commands.registerCommand('markdown-rich-preview.exportToEpub', async () => {
+            console.log('Markdown Rich Preview & Export: exportToEpub command triggered');
+            const editor = vscode.window.activeTextEditor;
+
+            if (!editor || editor.document.languageId !== 'markdown') {
+                vscode.window.showErrorMessage('Please open a Markdown file first to export to EPUB.');
+                return;
+            }
+
+            const markdownContent = editor.document.getText();
+            const workspaceRoot = vscode.workspace.getWorkspaceFolder(editor.document.uri)?.uri.fsPath;
+
+            // Extract metadata from frontmatter
+            const metadata = extractFrontMatter(markdownContent);
+            const defaultTitle = metadata.title || path.basename(editor.document.fileName, path.extname(editor.document.fileName));
+            const author = metadata.author || 'Unknown Author';
+            const description = metadata.description || '';
+
+            // Generate HTML content for EPUB (without PDF-specific styles)
+            // For EPUB we want inline styles so don't rely on external asset base
+            const htmlContent = getHtmlForWebview(markdownContent, false, undefined, editor.document.fileName, workspaceRoot);
+
+            const defaultFileName = path.basename(editor.document.fileName, path.extname(editor.document.fileName)) + '.epub';
+            const uri = await vscode.window.showSaveDialog({
+                defaultUri: vscode.Uri.file(path.join(editor.document.uri.fsPath, '..', defaultFileName)),
+                filters: {
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    'EPUB Files': ['epub']
+                }
+            });
+
+            if (uri) {
+                try {
+                    await vscode.window.withProgress({
+                        location: vscode.ProgressLocation.Notification,
+                        title: 'Generating EPUB...',
+                        cancellable: false
+                    }, async () => {
+                        try {
+                            // Configure EPUB options (metadata only, no content)
+                            const epubOptions = {
+                                title: defaultTitle,
+                                author: author,
+                                publisher: 'Markdown Rich Preview & Export',
+                                description: description,
+                                // Add custom CSS for better formatting
+                                css: `
+                                    body { 
+                                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; 
+                                        line-height: 1.6; 
+                                        padding: 1em;
+                                    }
+                                    pre { 
+                                        background-color: #f6f8fa; 
+                                        padding: 1em; 
+                                        border-radius: 6px; 
+                                        overflow-x: auto; 
+                                    }
+                                    code { 
+                                        font-family: 'Courier New', Courier, monospace; 
+                                        background-color: #f6f8fa; 
+                                        padding: 0.2em 0.4em; 
+                                        border-radius: 3px; 
+                                    }
+                                    pre code { 
+                                        background-color: transparent; 
+                                        padding: 0; 
+                                    }
+                                    img { 
+                                        max-width: 100%; 
+                                        height: auto; 
+                                    }
+                                    table { 
+                                        border-collapse: collapse; 
+                                        width: 100%; 
+                                        margin: 1em 0; 
+                                    }
+                                    th, td { 
+                                        border: 1px solid #dfe2e5; 
+                                        padding: 6px 13px; 
+                                    }
+                                    th { 
+                                        font-weight: 600; 
+                                        background-color: #f6f8fa; 
+                                    }
+                                    blockquote { 
+                                        margin: 0; 
+                                        padding: 0 1em; 
+                                        color: #6a737d; 
+                                        border-left: 0.25em solid #dfe2e5; 
+                                    }
+                                `,
+                                verbose: false
+                            };
+
+                            // Content structure - epub-gen-memory expects this as second argument
+                            const epubContent = [
+                                {
+                                    title: defaultTitle,
+                                    content: htmlContent
+                                }
+                            ];
+
+                            // Generate EPUB - epub-gen-memory signature: (options, content) => Promise<Buffer>
+                            const epubBuffer = await epubGen(epubOptions, epubContent);
+
+                            // Write the buffer to file
+                            fs.writeFileSync(uri.fsPath, epubBuffer);
+
+                            vscode.window.showInformationMessage(`Successfully exported EPUB to ${path.basename(uri.fsPath)}`);
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`Failed to export EPUB: ${error instanceof Error ? error.message : String(error)}`);
+                            console.error('EPUB Export Error:', error);
+                            throw error;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error in EPUB export:', error);
+                }
+            }
+        });
+
+        context.subscriptions.push(exportToEpubCommand);
         console.log('Markdown Rich Preview & Export: activate() completed successfully');
     } catch (error) {
         console.error('Markdown Rich Preview & Export: activate() failed:', error);

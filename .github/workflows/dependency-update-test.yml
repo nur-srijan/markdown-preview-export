@@ -42,7 +42,7 @@ jobs:
             // Test basic browser launch
             const browser = await puppeteer.launch({ 
               headless: true,
-              args: ['--no-sandbox', '--disable-setuid-sandbox']
+              args: []
             });
             
             // Test API compatibility - check if methods used in extension still exist
