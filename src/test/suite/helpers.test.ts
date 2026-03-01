@@ -119,11 +119,45 @@ suite('Helpers Test Suite', () => {
         });
 
         test('should parse front matter', () => {
-            const markdown = '---\ntitle: Hello\nauthor: Me\n---\n# Content';
+        test('should parse front matter into a table', () => {
+            const markdown = '---\ntitle: My Page\nauthor: Jules\ntags: [testing, improve]\n---\n# Content';
             const html = getHtmlForWebview(markdown);
-            assert.ok(html.includes('title'), 'Should include front matter key');
-            assert.ok(html.includes('Hello'), 'Should include front matter value');
-            assert.ok(html.includes('id="content"'), 'Should include content heading ID');
+            
+            // Check table structure
+            assert.ok(html.includes('<div class="front-matter">'), 'Should have front-matter div');
+            assert.ok(html.includes('<div class="front-matter-title">Front Matter</div>'), 'Should have title');
+            assert.ok(html.includes('<table>'), 'Should have table');
+            
+            // Check key-value pairs
+            assert.ok(html.includes('<td><strong>title</strong></td><td>My Page</td>'), 'Should have title row');
+            assert.ok(html.includes('<td><strong>author</strong></td><td>Jules</td>'), 'Should have author row');
+            
+            // Check array value joining
+            assert.ok(html.includes('<td><strong>tags</strong></td><td>testing, improve</td>'), 'Should join array values with comma');
+            
+            // Check content is still there
+            assert.ok(html.includes('id="content"'), 'Should include heading ID');
+            assert.ok(html.includes('Content'), 'Should include content');
+            
+            // Check front matter block is removed from the body content (it shouldn't appear as raw text)
+            // We search for the raw block in the HTML
+            assert.strictEqual(html.includes('---\ntitle: My Page'), false, 'Raw front matter block should be removed');
+        });
+
+        test('should handle non-string scalar values in front matter', () => {
+            const markdown = '---\nversion: 1.2\npublished: true\n---\n# Content';
+            const html = getHtmlForWebview(markdown);
+            assert.ok(html.includes('<td><strong>version</strong></td><td>1.2</td>'), 'Should handle numbers');
+            assert.ok(html.includes('<td><strong>published</strong></td><td>true</td>'), 'Should handle booleans');
+        });
+
+        test('should handle invalid YAML in front matter gracefully', () => {
+            const markdown = '---\nkey: : invalid\n---\n# Content';
+            const html = getHtmlForWebview(markdown);
+            // If YAML parsing fails, frontMatterTable stays empty
+            assert.strictEqual(html.includes('class="front-matter"'), false, 'Should not have front matter table on invalid YAML');
+            // But content should still be rendered (it will include the original block as per code)
+            assert.ok(html.includes('key: : invalid'), 'Original content should be preserved if parsing fails');
         });
 
         test('should generate heading IDs', () => {
@@ -169,4 +203,5 @@ suite('Helpers Test Suite', () => {
             assert.ok(html.includes('src="file:///path/with%20spaces/img.png"'));
         });
     });
+});
 });
