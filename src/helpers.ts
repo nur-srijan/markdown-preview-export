@@ -52,7 +52,7 @@ export function getChromeExecutableCandidates(): string[] {
         process.env.PUPPETEER_EXECUTABLE_PATH,
         process.env.CHROME_PATH
     ].filter((p): p is string => !!p && p.length > 0);
-    return [...envPaths, ...candidates].filter((p, idx, arr) => arr.indexOf(p) === idx);
+    return [...new Set([...envPaths, ...candidates])];
 }
 
 interface FrontMatterMetadata {
@@ -186,7 +186,7 @@ export function getHtmlForWebview(
     if (match) {
         try {
             const frontMatterYaml = match[1];
-            const frontMatterData = yaml.load(frontMatterYaml) as Record<string, any>;
+            const frontMatterData = yaml.load(frontMatterYaml) as Record<string, unknown>;
 
             if (frontMatterData && Object.keys(frontMatterData).length > 0) {
                 frontMatterTable = '<div class="front-matter"><div class="front-matter-title">Front Matter</div><table>';
