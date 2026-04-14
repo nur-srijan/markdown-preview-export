@@ -66,8 +66,3 @@ assets/deprecated/
 RollingUpdates.md
 SecurityDog.md
 FeatureRequests.md
-
-# Lock files (uncomment if not tracking exact versions)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
