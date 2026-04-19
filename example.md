@@ -8,10 +8,10 @@ tags: [gfm, preview, export]
 
 This file demonstrates the newly added GitHub Flavored Markdown (GFM) features.
 
-## 1. Front Matter
+### 1. Front Matter
 The YAML block at the top of this file is rendered as a clean table.
 
-## 2. GitHub-Style Alerts
+### 2. GitHub-Style Alerts
 > [!NOTE]
 > This is a note alert.
 
@@ -27,24 +27,24 @@ The YAML block at the top of this file is rendered as a clean table.
 > [!CAUTION]
 > This is a caution alert.
 
-## 3. Task Lists
+### 3. Task Lists
 - [x] Support for GitHub alerts
 - [x] Support for footnotes
 - [x] Support for front matter
 - [ ] Support for Mermaid (Coming soon)
 
-## 4. Footnotes
+### 4. Footnotes
 Here is a reference to a footnote[^1].
 And another one for more details[^2].
 
-## 5. Heading IDs
+### 5. Heading IDs
 You can link to this section using `#5-heading-ids` in the URL!
 
-## 6. Mathematical Expressions (KaTeX)
+### 6. Mathematical Expressions (KaTeX)
 The quadratic formula is:
 $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
 
-## 7. Code Highlighting (Hljs)
+### 7. Code Highlighting (Hljs)
 ```typescript
 function hello() {
     console.log("Hello, world 🌍!");
@@ -88,9 +88,9 @@ fn main() {
 - Emojis: 🌍 👋 👌 😎 🚀 🐍 ✅ ❌
 - Custom Emoji: :wave: :smile: :heart: :sparkles: :rocket: :snake: :white_check_mark: :x:
 
-## 11. Blockquotes
+### 11. Blockquotes
 > This is a blockquote.
 
----
+
 [^1]: This is the first footnote.
 [^2]: Footnotes are useful for detailed explanations without cluttering the main text.
