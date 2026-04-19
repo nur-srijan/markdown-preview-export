@@ -386,7 +386,7 @@ export function getHtmlForWebview(
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color:rgb(32, 30, 43);
+            background-color:rgba(0, 0, 0, 1);
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
