@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.1) - 2026-04-21
+### 🐛 Bug Fixes
+
+- **Theme Support**: Fixed an issue where the preview was not loading on some systems.
+- **Code Block Theme**: Fixed an issue where the code block theme was not loading on some systems.
+- **Dependencies**: Updated dependencies to fix CVEs.
+
 ## [1.2.0](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.0) - 2026-01-21
 ### 🚀 New Features
 

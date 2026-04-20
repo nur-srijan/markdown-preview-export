@@ -370,7 +370,7 @@ export function getHtmlForWebview(
             font-weight: 600; 
         }
         pre {
-            background-color: var(--vscode-textCodeBlock-background, rgb(9, 7, 10));
+            background-color: var(--vscode-textCodeBlock-background, #f6f8fa);
             overflow: auto;
             margin: 0;
         }
@@ -385,7 +385,7 @@ export function getHtmlForWebview(
         }
         .code-block {
             position: relative;
-            background-color: var(--vscode-textCodeBlock-background, rgb(9, 7, 10));
+            background-color: var(--vscode-textCodeBlock-background, #f6f8fa);
             border-radius: 6px;
             margin: 1em 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -396,19 +396,19 @@ export function getHtmlForWebview(
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color: var(--vscode-editorGroupHeader-tabsBackground, rgba(0, 0, 0, 1));
+            background-color: var(--vscode-editorGroupHeader-tabsBackground, #eaecef);
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
         .language {
-            color: var(--vscode-editor-foreground, #efe9e9);
+            color: var(--vscode-editor-foreground, #24292e);
             font-size: 0.9em;
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
         }
         .copy-button {
             padding: 4px 8px;
             font-size: 0.9em;
-            color: var(--vscode-editor-foreground, #efe9e9);
+            color: var(--vscode-editor-foreground, #24292e);
             background-color: transparent;
             border: 1px solid var(--vscode-editorGroup-border, #ddd);
             border-radius: 4px;

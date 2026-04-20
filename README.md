@@ -33,7 +33,7 @@ A powerful VS Code extension that brings GitHub-style Markdown previews and one-
 ## 🚀 Quick Start
 
 1. **Install** the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview)
-2. **Open** any Markdown ([.md]()) file
+2. **Open** any Markdown (.md) file
 3. **Right-click** in the editor and choose one of these options:
    - "Markdown: Open Enhanced Preview" - For live preview
    - "Markdown: Export to HTML" - To save as HTML
