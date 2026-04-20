@@ -18,15 +18,6 @@ The YAML block at the top of this file is rendered as a clean table.
 > [!TIP]
 > This is a tip alert with a small padding adjustment.
 
-> [!IMPORTANT]
-> This is an important alert.
-
-> [!WARNING]
-> This is a warning alert.
-
-> [!CAUTION]
-> This is a caution alert.
-
 ### 3. Task Lists
 - [x] Support for GitHub alerts
 - [x] Support for footnotes
@@ -43,6 +34,24 @@ You can link to this section using `#5-heading-ids` in the URL!
 ### 6. Mathematical Expressions (KaTeX)
 The quadratic formula is:
 $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+The Gamma function is defined as:
+$$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt$$
+
+Maxwell's equation example:
+$$
+\nabla \times \mathbf{B} = \mu_0 \mathbf{J} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}
+$$
+
+Cauchy-Schwarz inequality:
+$$
+|\langle x, y \rangle|^2 \leq \langle x, x \rangle \langle y, y \rangle
+$$
+
+Chemical equation example:
+$$
+\text{CH}_4 + 2\text{O}_2 \rightarrow \text{CO}_2 + 2\text{H}_2\text{O}
+$$
 
 ### 7. Code Highlighting (Hljs)
 ```typescript
