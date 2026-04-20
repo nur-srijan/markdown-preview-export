@@ -3,7 +3,7 @@
   "displayName": "Markdown Rich Preview & Export",
   "description": "GitHub-style Markdown previews with seamless PDF and HTML export",
   "icon": "images/icon.png",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "nur-srijan",
   "author": {
     "name": "Nur Srijan",
@@ -78,6 +78,10 @@
     "mocha": "^11.3.0",
     "nyc": "^15.1.0",
     "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.5"
   },
   "categories": [
     "Formatters",

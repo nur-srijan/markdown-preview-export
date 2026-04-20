@@ -263,7 +263,12 @@ export function getHtmlForWebview(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource || '*'} 'self' data: https: file:; script-src ${cspSource || '*'} 'unsafe-inline'; style-src ${cspSource || '*'} 'unsafe-inline' https: file:; font-src ${cspSource || '*'} https: file:;">
     <title>Markdown: Rich Preview</title>
-    <link rel="stylesheet" href="${vendor ? (isForPdf ? vendor + '/highlight/styles/github.min.css' : vendor + '/highlight/styles/github-dark.min.css') : (isForPdf ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css')}" onerror="console.error('Failed to load Highlight.js CSS:', this.href)">
+    ${!isForPdf ? `
+    <link id="highlight-css-light" rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'}" disabled>
+    <link id="highlight-css-dark" rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
+    ` : `
+    <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'}">
+    `}
     <link rel="stylesheet" href="${vendor ? vendor + '/katex/katex.min.css' : 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'}" onerror="console.error('Failed to load KaTeX CSS:', this.href)">
     <script>
         // Highlighting is done on the extension side during markdown parsing.
@@ -331,15 +336,20 @@ export function getHtmlForWebview(
         }
         h1 { 
             font-size: 2em; 
-            border-bottom: 1px solid #eaecef; 
+            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef); 
             padding-bottom: 0.3em;
             margin-top: 0.67em 0;
         }
         h2 { 
             font-size: 1.5em; 
-            border-bottom: 1px solid #eaecef; 
+            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef); 
             padding-bottom: 0.3em;
             margin-top: 1.5em;
+        }
+        hr {
+            border: 0;
+            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef);
+            margin: 1.5em 0;
         }
         h3 { 
             font-size: 1.25em; 
@@ -360,7 +370,7 @@ export function getHtmlForWebview(
             font-weight: 600; 
         }
         pre {
-            background-color:rgb(9, 7, 10);
+            background-color: var(--vscode-textCodeBlock-background, rgb(9, 7, 10));
             overflow: auto;
             margin: 0;
         }
@@ -375,7 +385,7 @@ export function getHtmlForWebview(
         }
         .code-block {
             position: relative;
-            background-color:rgb(9, 7, 10);
+            background-color: var(--vscode-textCodeBlock-background, rgb(9, 7, 10));
             border-radius: 6px;
             margin: 1em 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -386,28 +396,28 @@ export function getHtmlForWebview(
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color:rgba(0, 0, 0, 1);
+            background-color: var(--vscode-editorGroupHeader-tabsBackground, rgba(0, 0, 0, 1));
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
         .language {
-            color: #efe9e9;
+            color: var(--vscode-editor-foreground, #efe9e9);
             font-size: 0.9em;
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
         }
         .copy-button {
             padding: 4px 8px;
             font-size: 0.9em;
-            color: #efe9e9;
+            color: var(--vscode-editor-foreground, #efe9e9);
             background-color: transparent;
-            border: 1px solid #ddd;
+            border: 1px solid var(--vscode-editorGroup-border, #ddd);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .copy-button:hover {
-            background-color: #e9e9e9;
-            border-color: #ccc;
+            background-color: var(--vscode-button-secondaryHoverBackground, #e9e9e9);
+            border-color: var(--vscode-button-border, #ccc);
         }
         blockquote {
             margin: 0;
@@ -532,6 +542,27 @@ export function getHtmlForWebview(
 </head>
 <body>
     ${htmlContent}
+    ${!isForPdf ? `
+    <script>
+        function updateTheme() {
+            const isLight = document.body.classList.contains('vscode-light');
+            const linkLight = document.getElementById('highlight-css-light');
+            const linkDark = document.getElementById('highlight-css-dark');
+            if (linkLight && linkDark) {
+                linkLight.disabled = !isLight;
+                linkDark.disabled = isLight;
+            }
+        }
+        updateTheme();
+        new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.attributeName === 'class') {
+                    updateTheme();
+                }
+            }
+        }).observe(document.body, { attributes: true });
+    </script>
+    ` : ''}
 </body>
 </html>`;
 }
