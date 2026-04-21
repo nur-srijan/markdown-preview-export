@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.2](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.2) - 2026-04-21
+
+- Version bump due to internal changes.
+
 ## [1.2.1](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.1) - 2026-04-21
 ### 🐛 Bug Fixes
 
