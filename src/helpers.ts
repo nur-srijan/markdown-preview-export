@@ -265,7 +265,7 @@ export function getHtmlForWebview(
     <title>Markdown: Rich Preview</title>
     ${!isForPdf ? `
     <link id="highlight-css-light" rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'}" disabled>
-    <link id="highlight-css-dark" rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css'}">
+    <link id="highlight-css-dark" rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github-dark-dimmed.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark-dimmed.min.css'}">
     ` : `
     <link rel="stylesheet" href="${vendor ? vendor + '/highlight/styles/github.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'}">
     `}
@@ -331,11 +331,85 @@ export function getHtmlForWebview(
             }
         }
         ` : ''}
+        :root {
+            --preview-bg: #ffffff;
+            --preview-fg: #24292e;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #eaecef;
+            --code-fg: #24292e;
+            --border-color: #eaecef;
+            --link-color: #0366d6;
+            --blockquote-fg: #6a737d;
+            --blockquote-border: #dfe2e5;
+            --table-row-border: #dfe2e5;
+            --table-row-bg: #ffffff;
+            --table-zebra-bg: #f6f8fa;
+            --button-border: #ccc;
+            --button-hover-bg: #e9e9e9;
+        }
+
+        ${!isForPdf ? `
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --preview-bg: #0d1117;
+                --preview-fg: #c9d1d9;
+                --code-bg: #161b22;
+                --code-header-bg: #21262d;
+                --code-fg: #c9d1d9;
+                --border-color: #30363d;
+                --link-color: #58a6ff;
+                --blockquote-fg: #8b949e;
+                --blockquote-border: #30363d;
+                --table-row-border: #30363d;
+                --table-row-bg: #0d1117;
+                --table-zebra-bg: #161b22;
+                --button-border: #30363d;
+                --button-hover-bg: #30363d;
+            }
+        }
+        ` : ''}
+
+        body.vscode-light {
+            --preview-bg: var(--vscode-editor-background);
+            --preview-fg: var(--vscode-editor-foreground);
+            --code-bg: var(--vscode-textCodeBlock-background, var(--vscode-editor-background));
+            --code-header-bg: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-editor-background));
+            --code-fg: var(--vscode-editor-foreground);
+            --border-color: var(--vscode-editorGroup-border, #eaecef);
+            --link-color: var(--vscode-textLink-foreground, #0366d6);
+            --blockquote-fg: var(--vscode-descriptionForeground, #6a737d);
+            --blockquote-border: var(--vscode-editorGroup-border, #dfe2e5);
+            --table-row-border: var(--vscode-editorGroup-border, #dfe2e5);
+            --table-row-bg: var(--vscode-editor-background, #ffffff);
+            --table-zebra-bg: var(--vscode-list-hoverBackground, #f6f8fa);
+            --button-border: var(--vscode-button-border, #ddd);
+            --button-hover-bg: var(--vscode-button-secondaryHoverBackground, #e9e9e9);
+        }
+
+        body.vscode-dark, body.vscode-high-contrast {
+            --preview-bg: var(--vscode-editor-background);
+            --preview-fg: var(--vscode-editor-foreground);
+            --code-bg: var(--vscode-textCodeBlock-background, var(--vscode-editor-background));
+            --code-header-bg: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-editor-background));
+            --code-fg: var(--vscode-editor-foreground);
+            --border-color: var(--vscode-editorGroup-border, #eaecef);
+            --link-color: var(--vscode-textLink-foreground, #0366d6);
+            --blockquote-fg: var(--vscode-descriptionForeground, #6a737d);
+            --blockquote-border: var(--vscode-editorGroup-border, #dfe2e5);
+            --table-row-border: var(--vscode-editorGroup-border, #dfe2e5);
+            --table-row-bg: var(--vscode-editor-background, #ffffff);
+            --table-zebra-bg: var(--vscode-list-hoverBackground, #f6f8fa);
+            --button-border: var(--vscode-button-border, #ddd);
+            --button-hover-bg: var(--vscode-button-secondaryHoverBackground, #e9e9e9);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
             font-size: 14px;
             line-height: 1.6;
             padding: 0 20px;
+            background-color: var(--preview-bg);
+            color: var(--preview-fg);
         }
         img.emoji {
             height: 1em;
@@ -352,19 +426,19 @@ export function getHtmlForWebview(
         }
         h1 { 
             font-size: 2em; 
-            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef); 
+            border-bottom: 1px solid var(--border-color); 
             padding-bottom: 0.3em;
             margin-top: 0.67em 0;
         }
         h2 { 
             font-size: 1.5em; 
-            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef); 
+            border-bottom: 1px solid var(--border-color); 
             padding-bottom: 0.3em;
             margin-top: 1.5em;
         }
         hr {
             border: 0;
-            border-bottom: 1px solid var(--vscode-editorGroup-border, #eaecef);
+            border-bottom: 1px solid var(--border-color);
             margin: 1.5em 0;
         }
         h3 { 
@@ -376,7 +450,7 @@ export function getHtmlForWebview(
             margin-top: 1em;
         }
         a { 
-            color: #0366d6; 
+            color: var(--link-color); 
             text-decoration: none; 
         }
         a:hover { 
@@ -386,7 +460,7 @@ export function getHtmlForWebview(
             font-weight: 600; 
         }
         pre {
-            background-color: var(--vscode-textCodeBlock-background, #f6f8fa);
+            background-color: var(--code-bg);
             overflow: auto;
             margin: 0;
         }
@@ -401,7 +475,7 @@ export function getHtmlForWebview(
         }
         .code-block {
             position: relative;
-            background-color: var(--vscode-textCodeBlock-background, #f6f8fa);
+            background-color: var(--code-bg);
             border-radius: 6px;
             margin: 1em 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -412,34 +486,34 @@ export function getHtmlForWebview(
             justify-content: space-between;
             align-items: center;
             padding: 4px 10px;
-            background-color: var(--vscode-editorGroupHeader-tabsBackground, #eaecef);
+            background-color: var(--code-header-bg);
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
         .language {
-            color: var(--vscode-editor-foreground, #24292e);
+            color: var(--preview-fg);
             font-size: 0.9em;
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
         }
         .copy-button {
             padding: 4px 8px;
             font-size: 0.9em;
-            color: var(--vscode-editor-foreground, #24292e);
+            color: var(--preview-fg);
             background-color: transparent;
-            border: 1px solid var(--vscode-editorGroup-border, #ddd);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .copy-button:hover {
-            background-color: var(--vscode-button-secondaryHoverBackground, #e9e9e9);
-            border-color: var(--vscode-button-border, #ccc);
+            background-color: var(--button-hover-bg);
+            border-color: var(--button-border);
         }
         blockquote {
             margin: 0;
             padding: 0 1em;
-            color: #6a737d;
-            border-left: 0.25em solid #dfe2e5;
+            color: var(--blockquote-fg);
+            border-left: 0.25em solid var(--blockquote-border);
         }
         ul, ol {
             padding-left: 2em;
@@ -456,14 +530,14 @@ export function getHtmlForWebview(
         }
         table th, table td {
             padding: 6px 13px;
-            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
+            border: 1px solid var(--table-row-border);
         }
         table tr {
-            background-color: var(--vscode-editor-background, #fff);
-            border-top: 1px solid var(--vscode-editorGroup-border, #c6cbd1);
+            background-color: var(--table-row-bg);
+            border-top: 1px solid var(--table-row-border);
         }
         table tr:nth-child(2n) {
-            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
+            background-color: var(--table-zebra-bg);
         }
         img {
             max-width: 100%;
@@ -500,8 +574,8 @@ export function getHtmlForWebview(
         /* Footnotes */
         .footnotes {
             font-size: 12px;
-            color: #6a737d;
-            border-top: 1px solid #dfe2e5;
+            color: var(--blockquote-fg);
+            border-top: 1px solid var(--border-color);
             margin-top: 24px;
         }
         .footnotes ol {
@@ -530,10 +604,10 @@ export function getHtmlForWebview(
         /* Front Matter */
         .front-matter {
             margin-bottom: 24px;
-            border: 1px solid var(--vscode-editorGroup-border, #dfe2e5);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 12px;
-            background-color: var(--vscode-list-hoverBackground, #f6f8fa);
+            background-color: var(--table-zebra-bg);
         }
         .front-matter table {
             margin-bottom: 0;
@@ -551,7 +625,7 @@ export function getHtmlForWebview(
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 12px;
-            color: var(--vscode-descriptionForeground, #6a737d);
+            color: var(--blockquote-fg);
             text-transform: uppercase;
         }
     </style>
@@ -561,7 +635,17 @@ export function getHtmlForWebview(
     ${!isForPdf ? `
     <script>
         function updateTheme() {
-            const isLight = document.body.classList.contains('vscode-light');
+            const isVSCode = document.body.classList.contains('vscode-light') || 
+                             document.body.classList.contains('vscode-dark') || 
+                             document.body.classList.contains('vscode-high-contrast');
+            
+            let isLight;
+            if (isVSCode) {
+                isLight = document.body.classList.contains('vscode-light');
+            } else {
+                isLight = !window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
             const linkLight = document.getElementById('highlight-css-light');
             const linkDark = document.getElementById('highlight-css-dark');
             if (linkLight && linkDark) {
@@ -569,7 +653,9 @@ export function getHtmlForWebview(
                 linkDark.disabled = isLight;
             }
         }
+        
         updateTheme();
+        
         new MutationObserver((mutations) => {
             for (const mutation of mutations) {
                 if (mutation.attributeName === 'class') {
@@ -577,6 +663,8 @@ export function getHtmlForWebview(
                 }
             }
         }).observe(document.body, { attributes: true });
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
     </script>
     ` : ''}
 </body>

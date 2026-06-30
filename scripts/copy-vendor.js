@@ -28,16 +28,16 @@ const out = path.join(root, 'assets', 'vendor');
 console.log('Copying vendor assets to', out);
 
 // Whitelist minimal assets we actually use:
-// - highlight.js: github-dark.min.css + highlight.min.js (if available)
+// - highlight.js: github-dark-dimmed.min.css + highlight.min.js (if available)
 // - KaTeX: katex.min.css + fonts/
 try {
   const hljsPkg = require.resolve('highlight.js');
   const hljsDir = path.dirname(hljsPkg);
   // copy single theme
-  const themeSrc = path.join(hljsDir, '..', 'styles', 'github-dark.min.css');
+  const themeSrc = path.join(hljsDir, '..', 'styles', 'github-dark-dimmed.min.css');
   const lightThemeSrc = path.join(hljsDir, '..', 'styles', 'github.min.css');
   if (fs.existsSync(themeSrc)) {
-    copyFileSync(themeSrc, path.join(out, 'highlight', 'styles', 'github-dark.min.css'));
+    copyFileSync(themeSrc, path.join(out, 'highlight', 'styles', 'github-dark-dimmed.min.css'));
   }
   if (fs.existsSync(lightThemeSrc)) {
     copyFileSync(lightThemeSrc, path.join(out, 'highlight', 'styles', 'github.min.css'));

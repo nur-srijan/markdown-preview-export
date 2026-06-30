@@ -77,13 +77,13 @@ suite('Helpers Test Suite', () => {
         test('should use local vendor assets when assetBase is provided', () => {
             const assetBase = 'file:///path/to/assets';
             const html = getHtmlForWebview('# Hello', false, assetBase);
-            assert.ok(html.includes('href="file:///path/to/assets/highlight/styles/github-dark.min.css"'));
+            assert.ok(html.includes('href="file:///path/to/assets/highlight/styles/github-dark-dimmed.min.css"'));
             assert.ok(html.includes('href="file:///path/to/assets/katex/katex.min.css"'));
         });
 
         test('should use CDN assets when assetBase is not provided', () => {
             const html = getHtmlForWebview('# Hello', false);
-            assert.ok(html.includes('href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"'));
+            assert.ok(html.includes('href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark-dimmed.min.css"'));
             assert.ok(html.includes('href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"'));
         });
 
