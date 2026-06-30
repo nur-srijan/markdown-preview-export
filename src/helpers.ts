@@ -299,12 +299,28 @@ export function getHtmlForWebview(
             h1, h2, h3 {
                 page-break-before: auto;
             }
-            pre, .code-block, figure, table {
+            figure, table {
                 page-break-inside: avoid;
             }
             pre, code {
                 background-color: #f6f8fa !important;
                 color: #24292e !important;
+                overflow: visible !important;
+                white-space: pre-wrap !important;
+                overflow-wrap: break-word !important;
+            }
+            .code-block {
+                background-color: #f6f8fa !important;
+                box-shadow: none !important;
+                border: 1px solid #eaecef !important;
+                overflow: visible !important;
+            }
+            .code-header {
+                background-color: #eaecef !important;
+                border-bottom: 1px solid #eaecef !important;
+            }
+            .copy-button {
+                display: none !important;
             }
             .hljs {
                 background: #f6f8fa !important;
