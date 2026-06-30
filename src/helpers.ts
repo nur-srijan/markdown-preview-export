@@ -354,7 +354,7 @@ export function getHtmlForWebview(
                 --preview-bg: #0d1117;
                 --preview-fg: #c9d1d9;
                 --code-bg: #161b22;
-                --code-header-bg: #21262d;
+                --code-header-bg: #21262d69;
                 --code-fg: #c9d1d9;
                 --border-color: #30363d;
                 --link-color: #58a6ff;

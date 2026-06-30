@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.3.0](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.3.0) - 2026-06-30
+
+### 🚀 New Features
+
+- System Theme Auto-detection (for HTML Exports):
+
+    - When you export to HTML, the page will now auto-detect the user's system preferences using standard CSS variables and media queries.
+    - If the system is in Dark mode, the entire document (background, typography, code block container, and headers) will dynamically switch to a dark theme, and github-dark.min.css will be loaded.
+    - If the system is in Light mode, it uses a clean GitHub-style light theme with light code blocks and github.min.css.
+    - It dynamically listens for changes to the system theme (prefers-color-scheme), so it updates instantly if you switch your OS theme.
+
+### 🐛 Bug Fixes
+
+- Reverted page-break-inside avoiding for code blocks to fix inconveniences for long code blocks.
+- Fixed incorrect rendering of box-shadow as grey border.
+- Fixed missing background after page break.
+- Hid the copy-to-clipboard button (.copy-button { display: none !important; }) from exported PDFs
+
+
 ## [1.2.2](https://marketplace.visualstudio.com/items?itemName=nur-srijan.markdown-rich-preview&version=1.2.2) - 2026-04-21
 
 - Version bump due to internal changes.
