@@ -52,6 +52,12 @@ suite('Helpers Test Suite', () => {
     });
 
     suite('getHtmlForWebview', () => {
+        test('should handle empty input correctly', () => {
+            const html = getHtmlForWebview('');
+            assert.ok(html.includes('<body'), 'Should contain body tag');
+            assert.ok(html.includes('</body>'), 'Should contain closing body tag');
+        });
+
         test('should convert basic Markdown to HTML', () => {
             const markdown = '# Hello\n\nThis is **bold** text.';
             const html = getHtmlForWebview(markdown);
