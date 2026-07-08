@@ -15,6 +15,17 @@ declare const global: { browserInstance?: puppeteer.Browser };
 // Reusable browser instance for PDF exports
 let browserInstance: puppeteer.Browser | null = null;
 
+// Output channel for logging
+let outputChannel: vscode.OutputChannel | null = null;
+
+function log(message: string, isError: boolean = false): void {
+    if (!outputChannel) {
+        return;
+    }
+    const prefix = isError ? '[ERROR]' : '[INFO]';
+    outputChannel.appendLine(`${prefix} ${message}`);
+}
+
 // Function to get or create browser instance
 async function getBrowserInstance(): Promise<puppeteer.Browser> {
     if (!browserInstance || !await isBrowserAvailable(browserInstance)) {
@@ -22,7 +33,7 @@ async function getBrowserInstance(): Promise<puppeteer.Browser> {
             try {
                 await browserInstance.close();
             } catch (error) {
-                console.error('Error closing browser instance:', error);
+                log(`Error closing browser instance: ${error instanceof Error ? error.message : String(error)}`, true);
             }
         }
         browserInstance = await launchPuppeteerWithFallbacks();
@@ -157,7 +168,7 @@ async function cleanupBrowser(): Promise<void> {
             await browserInstance.close();
             browserInstance = null;
         } catch (error) {
-            console.error('Error cleaning up browser instance:', error);
+            log(`Error cleaning up browser instance: ${error instanceof Error ? error.message : String(error)}`, true);
         }
     }
 }
@@ -165,9 +176,12 @@ async function cleanupBrowser(): Promise<void> {
 // Helpers moved to `src/helpers.ts` to allow unit tests without `vscode` runtime
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Markdown Rich Preview & Export: activate() started');
+    outputChannel = vscode.window.createOutputChannel('Markdown Rich Preview & Export');
+    context.subscriptions.push(outputChannel);
+
+    log('activate() started');
     try {
-        console.log('Markdown Rich Preview & Export: Registering commands...');
+        log('Registering commands...');
         const disposable = vscode.commands.registerCommand('markdown-rich-preview.showPreview', () => {
             const editor = vscode.window.activeTextEditor;
 
@@ -249,7 +263,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Register the export to PDF command
         const exportToPdfCommand = vscode.commands.registerCommand('markdown-rich-preview.exportToPdf', async () => {
-            console.log('Markdown Rich Preview & Export: exportToPdf command triggered');
+            log('exportToPdf command triggered');
             const editor = vscode.window.activeTextEditor;
 
             if (!editor || editor.document.languageId !== 'markdown') {
@@ -320,7 +334,7 @@ export function activate(context: vscode.ExtensionContext) {
                             vscode.window.showInformationMessage(`Successfully exported PDF to ${path.basename(uri.fsPath)}`);
                         } catch (error) {
                             vscode.window.showErrorMessage(`Failed to export PDF: ${error instanceof Error ? error.message : String(error)}`);
-                            console.error('PDF Export Error:', error);
+                            log(`PDF Export Error: ${error instanceof Error ? error.message : String(error)}`, true);
                             throw error; // Re-throw to ensure the progress indicator shows the error
                         } finally {
                             // Clean up temp file
@@ -330,26 +344,26 @@ export function activate(context: vscode.ExtensionContext) {
                                         fs.unlinkSync(tempHtmlPath);
                                     }
                                 } catch (e) {
-                                    console.warn('Failed to delete temp HTML file:', e);
+                                    log(`Failed to delete temp HTML file: ${e instanceof Error ? e.message : String(e)}`, true);
                                 }
                             }
 
                             if (page && !page.isClosed()) {
-                                await page.close().catch(console.error);
+                                await page.close().catch(err => log(`Error closing page: ${err instanceof Error ? err.message : String(err)}`, true));
                             }
                         }
                     });
                 } catch (error) {
-                    console.error('Error in PDF export:', error);
+                    log(`Error in PDF export: ${error instanceof Error ? error.message : String(error)}`, true);
                     // Don't close the browser here as we want to reuse it
                 }
             }
         });
 
         context.subscriptions.push(exportToPdfCommand);
-        console.log('Markdown Rich Preview & Export: activate() completed successfully');
+        log('activate() completed successfully');
     } catch (error) {
-        console.error('Markdown Rich Preview & Export: activate() failed:', error);
+        log(`activate() failed: ${error instanceof Error ? error.message : String(error)}`, true);
         vscode.window.showErrorMessage(`Failed to activate Markdown Rich Preview & Export: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
@@ -385,6 +399,10 @@ function updateContent(panel: vscode.WebviewPanel, document: vscode.TextDocument
 
 
 
-export function deactivate() {
-    void cleanupBrowser();
+export async function deactivate(): Promise<void> {
+    await cleanupBrowser();
+    if (outputChannel) {
+        outputChannel.dispose();
+        outputChannel = null;
+    }
 }
